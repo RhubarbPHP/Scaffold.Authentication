@@ -1,5 +1,5 @@
 {
-  "name": "rhubarbphp/Scaffold.Authentication",
+  "name": "rhubarbphp/scaffold-authentication",
   "description": "Provides some an out of the box solution for login and authentication.",
   "keywords": [ "authentication", "rhubarb", "php", "framework" ],
   "homepage": "http://www.rhubarbphp.com/",
