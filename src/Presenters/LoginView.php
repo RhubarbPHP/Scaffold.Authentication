@@ -20,7 +20,7 @@ namespace Rhubarb\Scaffolds\Authentication\Presenters;
 
 use Rhubarb\Leaf\Presenters\Controls\CheckBoxes\CheckBox;
 
-class LoginView extends \Rhubarb\Crown\Patterns\Mvp\BoilerPlates\Login\LoginView
+class LoginView extends \Rhubarb\Patterns\Mvp\BoilerPlates\Login\LoginView
 {
     public function createPresenters()
     {
