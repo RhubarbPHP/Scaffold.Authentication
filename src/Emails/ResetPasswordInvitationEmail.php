@@ -19,7 +19,7 @@
 namespace Rhubarb\Scaffolds\Authentication\Emails;
 
 use Rhubarb\Crown\AppSettings;
-use Rhubarb\Crown\Integration\Email\TemplateEmail;
+use Rhubarb\Crown\Email\TemplateEmail;
 
 class ResetPasswordInvitationEmail extends TemplateEmail
 {

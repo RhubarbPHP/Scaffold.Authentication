@@ -39,7 +39,7 @@ class LoginView extends \Rhubarb\Patterns\Mvp\BoilerPlates\Login\LoginView
                 <label class="check-label">&nbsp;<?= $this->presenters["RememberMe"] . " Remember Me"; ?></label>
             </div>
             <div class="panel-2 u-align-right">
-                <a href=""/login/reset/">I've forgotten my password.</a>
+                <a href="/login/reset/">I've forgotten my password.</a>
             </div>
         </div>
     <?php
