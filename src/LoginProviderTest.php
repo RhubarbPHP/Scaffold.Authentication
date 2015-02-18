@@ -27,7 +27,7 @@ class LoginProviderTest extends CoreTestCase
 
 		$loginProvider = new LoginProvider();
 
-		$this->assertFalse( $loginProvider->IsLoggedIn() );
+		$this->assertFalse( $loginProvider->isLoggedIn() );
 
 		Settings::DeleteSettingNamespace( "LoginProvider" );
 
@@ -35,7 +35,7 @@ class LoginProviderTest extends CoreTestCase
 
 		$loginProvider = new LoginProvider();
 
-		$this->assertTrue( $loginProvider->IsLoggedIn() );
+		$this->assertTrue( $loginProvider->isLoggedIn() );
 	}
 
 	public function testGetLoggedInUser()

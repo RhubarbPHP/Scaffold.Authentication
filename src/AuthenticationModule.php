@@ -27,9 +27,20 @@ use Rhubarb\Stem\Schema\SolutionSchema;
 
 class AuthenticationModule extends Module
 {
-    public function __construct($loginProviderClassName = null)
+    protected $urlToProtect;
+
+    /**
+     * Creates an instance of the Authentication module.
+     *
+     * @param null $loginProviderClassName
+     * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
+     *                                  the entire URL tree.
+     */
+    public function __construct($loginProviderClassName = null, $urlToProtect = "/")
     {
         parent::__construct();
+
+        $this->urlToProtect = $urlToProtect;
 
         if ($loginProviderClassName != null) {
             LoginProvider::setDefaultLoginProviderClassName($loginProviderClassName);
@@ -56,7 +67,7 @@ class AuthenticationModule extends Module
         $this->addUrlHandlers(
             [
                 "/login/" => $login,
-                "/" => $validateLoginUrlHandler
+                $this->urlToProtect => $validateLoginUrlHandler
             ]);
 
         // Make sure that the login url handlers are given greater precedence than those of the application.
