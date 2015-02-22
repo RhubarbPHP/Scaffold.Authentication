@@ -1,0 +1,25 @@
+{
+  "name": "rhubarbphp/scaffold-authentication",
+  "description": "Provides some an out of the box solution for login and authentication.",
+  "keywords": [ "authentication", "rhubarb", "php", "framework" ],
+  "homepage": "http://www.rhubarbphp.com/",
+  "license": "Apache-2.0",
+  "autoload": {
+    "psr-4": {
+      "Rhubarb\\Scaffolds\\Authentication\\": "src/",
+      "Rhubarb\\Scaffolds\\Authentication\\Tests\\": "tests/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/acuthbert/rhubarb"
+    }
+  ],
+  "require": {
+    "rhubarbphp/rhubarb": "dev-crown"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "3.*"
+  }
+}
