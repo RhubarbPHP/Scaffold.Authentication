@@ -25,11 +25,11 @@ use Rhubarb\Stem\Aggregates\Count;
 use Rhubarb\Stem\Exceptions\ModelException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\AutoIncrement;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\Boolean;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\DateTime;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\Varchar;
-use Rhubarb\Stem\Repositories\MySql\Schema\MySqlSchema;
+use Rhubarb\Stem\Schema\Columns\AutoIncrement;
+use Rhubarb\Stem\Schema\Columns\Boolean;
+use Rhubarb\Stem\Schema\Columns\DateTime;
+use Rhubarb\Stem\Schema\Columns\String;
+use Rhubarb\Stem\Schema\ModelSchema;
 
 class User extends Model
 {
@@ -40,19 +40,19 @@ class User extends Model
      */
     protected function createSchema()
     {
-        $schema = new MySqlSchema("tblAuthenticationUser");
+        $schema = new ModelSchema("tblAuthenticationUser");
 
         $schema->addColumn(
             new AutoIncrement("UserID"),
-            new Varchar("Username", 30),
-            new Varchar("Password", 200),
-            new Varchar("Forename", 80),
-            new Varchar("Surname", 80),
-            new Varchar("Email", 150),
-            new Varchar("Token", 200),
+            new String("Username", 30),
+            new String("Password", 200),
+            new String("Forename", 80),
+            new String("Surname", 80),
+            new String("Email", 150),
+            new String("Token", 200),
             new DateTime("TokenExpiry"),
             new Boolean("Enabled", false),
-            new Varchar("PasswordResetHash", 200),
+            new String("PasswordResetHash", 200),
             new DateTime("PasswordResetDate")
         );
 
