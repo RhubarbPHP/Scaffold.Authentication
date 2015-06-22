@@ -8,50 +8,50 @@ use Rhubarb\Crown\UnitTesting\CoreTestCase;
 
 class LoginProviderTest extends CoreTestCase
 {
-	public function testAutoLogin()
-	{
-		$user = new User();
-		$user->SetNewPassword( "abc123" );
-		$user->Username = "test";
-		$user->Forename = "test";
-		$user->Enabled = 1;
-		$user->Save();
+    public function testAutoLogin()
+    {
+        $user = new User();
+        $user->SetNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->Save();
 
-		$token = $user->CreateToken();
+        $token = $user->CreateToken();
 
-		Settings::DeleteSettingNamespace( "LoginProvider" );
+        Settings::DeleteSettingNamespace("LoginProvider");
 
-		$request = Context::CurrentRequest();
-		$request->Cookie( 'lun', "test" );
-		$request->Cookie( 'ltk', "anyoldvalue" );
+        $request = Context::CurrentRequest();
+        $request->Cookie('lun', "test");
+        $request->Cookie('ltk', "anyoldvalue");
 
-		$loginProvider = new LoginProvider();
+        $loginProvider = new LoginProvider();
 
-		$this->assertFalse( $loginProvider->isLoggedIn() );
+        $this->assertFalse($loginProvider->isLoggedIn());
 
-		Settings::DeleteSettingNamespace( "LoginProvider" );
+        Settings::DeleteSettingNamespace("LoginProvider");
 
-		$request->Cookie( 'ltk', $token );
+        $request->Cookie('ltk', $token);
 
-		$loginProvider = new LoginProvider();
+        $loginProvider = new LoginProvider();
 
-		$this->assertTrue( $loginProvider->isLoggedIn() );
-	}
+        $this->assertTrue($loginProvider->isLoggedIn());
+    }
 
-	public function testGetLoggedInUser()
-	{
-		$user = new User();
-		$user->SetNewPassword( "abc123" );
-		$user->Username = "test";
-		$user->Forename = "test";
-		$user->Enabled = 1;
-		$user->Save();
+    public function testGetLoggedInUser()
+    {
+        $user = new User();
+        $user->SetNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->Save();
 
-		$loginProvider = new LoginProvider();
-		$loginProvider->Login( "test", "abc123" );
+        $loginProvider = new LoginProvider();
+        $loginProvider->Login("test", "abc123");
 
-		$pUser = LoginProvider::GetLoggedInUser();
+        $pUser = LoginProvider::GetLoggedInUser();
 
-		$this->assertEquals( $user->UniqueIdentifier, $pUser->UniqueIdentifier );
-	}
+        $this->assertEquals($user->UniqueIdentifier, $pUser->UniqueIdentifier);
+    }
 }

@@ -2,38 +2,35 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Presenters;
 
-use Rhubarb\Crown\Context;
-use Rhubarb\Leaf\Views\UnitTestView;
-use Rhubarb\Crown\Request\WebRequest;
-use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Crown\UnitTesting\CoreTestCase;
+use Rhubarb\Leaf\Views\UnitTestView;
+use Rhubarb\Scaffolds\Authentication\User;
 
 class ConfirmResetPasswordPresenterTest extends CoreTestCase
 {
-	public function testResetHappens()
-	{
-		$user = new User();
-		$user->Username = "abc123";
-		$user->Forename = "Billy";
-		$user->SetNewPassword( "abc123" );
-		$user->Save();
+    public function testResetHappens()
+    {
+        $user = new User();
+        $user->Username = "abc123";
+        $user->Forename = "Billy";
+        $user->SetNewPassword("abc123");
+        $user->Save();
 
-		$oldPassword = $user->Password;
+        $oldPassword = $user->Password;
 
-		$hash = $user->GeneratePasswordResetHash();
+        $hash = $user->GeneratePasswordResetHash();
 
-		$mvp = new ConfirmResetPasswordPresenter();
-		$view = new UnitTestView();
-		$mvp->AttachMockView( $view );
+        $mvp = new ConfirmResetPasswordPresenter();
+        $view = new UnitTestView();
+        $mvp->AttachMockView($view);
 
-		$mvp->ItemIdentifier = $hash;
-		$mvp->NewPassword = "def324";
+        $mvp->ItemIdentifier = $hash;
+        $mvp->NewPassword = "def324";
 
-		$view->SimulateEvent( "ConfirmPasswordReset" );
+        $view->SimulateEvent("ConfirmPasswordReset");
 
-		$user->Reload();
+        $user->Reload();
 
-		$this->assertNotEquals( $oldPassword, $user->Password, "The password should have changed." );
-	}
+        $this->assertNotEquals($oldPassword, $user->Password, "The password should have changed.");
+    }
 }
- 
