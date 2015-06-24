@@ -1,12 +1,14 @@
 <?php
 
-namespace Rhubarb\Scaffolds\Authentication;
+namespace Rhubarb\Scaffolds\Authentication\Tests;
 
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Settings;
-use Rhubarb\Crown\UnitTesting\CoreTestCase;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Scaffolds\Authentication\LoginProvider;
+use Rhubarb\Scaffolds\Authentication\User;
 
-class LoginProviderTest extends CoreTestCase
+class LoginProviderTest extends RhubarbTestCase
 {
     public function testAutoLogin()
     {

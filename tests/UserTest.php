@@ -1,12 +1,13 @@
 <?php
 
-namespace Rhubarb\Scaffolds\Authentication;
+namespace Rhubarb\Scaffolds\Authentication\Tests;
 
 use Rhubarb\Crown\Encryption\HashProvider;
-use Rhubarb\Crown\UnitTesting\CoreTestCase;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\AuthenticationWithRoles\User;
 
-class UserTest extends CoreTestCase
+class UserTest extends RhubarbTestCase
 {
     public function testPasswordResetHash()
     {
@@ -71,7 +72,7 @@ class UserTest extends CoreTestCase
         $this->assertEquals($user->Token, $token, "The model wasn't saved");
         $this->assertTrue(strtotime($user->TokenExpiry) > time(), "Token Expiry wasn't set.");
 
-        $this->setExpectedException("Rhubarb\Scaffolds\Authentication\Exceptions\TokenException");
+        $this->setExpectedException(TokenException::class);
 
         $user = new User();
         $user->CreateToken();
@@ -109,7 +110,6 @@ class UserTest extends CoreTestCase
         $this->assertFalse($user->ValidateToken($token), "The token should be expired.");
     }
 
-
     public function testPasswordResetClearsResetHash()
     {
         $user = new User();
@@ -123,5 +123,4 @@ class UserTest extends CoreTestCase
         $user->Save();
         $this->assertEquals("", $user->PasswordResetHash);
     }
-
 }

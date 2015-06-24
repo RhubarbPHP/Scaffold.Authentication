@@ -1,12 +1,13 @@
 <?php
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Tests\Presenters;
 
-use Rhubarb\Crown\UnitTesting\CoreTestCase;
-use Rhubarb\Leaf\Views\UnitTestView;
+use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Leaf\Tests\Fixtures\Presenters\UnitTestView;
+use Rhubarb\Scaffolds\Authentication\Presenters\ConfirmResetPasswordPresenter;
 use Rhubarb\Scaffolds\Authentication\User;
 
-class ConfirmResetPasswordPresenterTest extends CoreTestCase
+class ConfirmResetPasswordPresenterTest extends RhubarbTestCase
 {
     public function testResetHappens()
     {

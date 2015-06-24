@@ -1,14 +1,15 @@
 <?php
 
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Tests\Presenters;
 
-use Rhubarb\Crown\Integration\Email\UnitTestingEmailProvider;
-use Rhubarb\Crown\UnitTesting\CoreTestCase;
-use Rhubarb\Leaf\Views\UnitTestView;
+use Rhubarb\Crown\Tests\Fixtures\UnitTestingEmailProvider;
+use Rhubarb\Leaf\Tests\Fixtures\Presenters\UnitTestView;
+use Rhubarb\Scaffolds\Authentication\Presenters\ResetPasswordPresenter;
 use Rhubarb\Stem\Schema\SolutionSchema;
+use Rhubarb\Stem\Tests\Fixtures\ModelUnitTestCase;
 
-class ResetPasswordPresenterTest extends CoreTestCase
+class ResetPasswordPresenterTest extends ModelUnitTestCase
 {
     public function testResetPasswordButton()
     {
