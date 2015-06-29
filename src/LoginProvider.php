@@ -19,6 +19,7 @@
 namespace Rhubarb\Scaffolds\Authentication;
 
 use Rhubarb\Crown\Context;
+use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
@@ -37,11 +38,11 @@ class LoginProvider extends ModelLoginProvider
         if (!$this->isLoggedIn()) {
             $request = Context::currentRequest();
 
-            if ($request->Cookie('lun') != "") {
-                $username = $request->Cookie('lun');
+            if ($request->cookie('lun') != "") {
+                $username = $request->cookie('lun');
                 $user = User::fromUsername($username);
 
-                $token = $request->Cookie('ltk');
+                $token = $request->cookie('ltk');
 
                 if ($user->validateToken($token)) {
                     $this->LoggedIn = true;
@@ -50,6 +51,20 @@ class LoginProvider extends ModelLoginProvider
                 }
             }
         }
+    }
+
+    public function rememberLogin()
+    {
+        $user = $this->getLoggedInUser();
+        HttpResponse::setCookie('lun', $this->getUsername());
+        HttpResponse::setCookie('ltk', $user->createToken());
+    }
+
+    protected function onLogOut()
+    {
+        parent::onLogOut();
+        HttpResponse::unsetCookie('lun');
+        HttpResponse::unsetCookie('ltk');
     }
 
     /**
