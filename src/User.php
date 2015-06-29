@@ -108,6 +108,11 @@ class User extends Model
         return self::findFirst(new Equals("PasswordResetHash", $hash));
     }
 
+    /**
+     * @param $username
+     * @return User
+     * @throws \Rhubarb\Stem\Exceptions\RecordNotFoundException
+     */
     public static function fromUsername($username)
     {
         return self::findFirst(new Equals("Username", $username));
