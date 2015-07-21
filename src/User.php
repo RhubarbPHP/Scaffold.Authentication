@@ -166,7 +166,7 @@ class User extends Model
 
     protected function setUsername($value)
     {
-        if (($value != $this->Username) && !$this->isNewRecord()) {
+        if ((!isset( $this->modelData["Username"]) || ( $value != $this->modelData["Username"] )) && !$this->isNewRecord()) {
             throw new ModelException("Username cannot be changed after a user has been created.", $this);
         }
 
