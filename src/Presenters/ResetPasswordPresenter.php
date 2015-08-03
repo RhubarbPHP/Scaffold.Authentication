@@ -2,9 +2,9 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Presenters;
 
-use Rhubarb\Crown\Integration\Email\Email;
 use Rhubarb\Leaf\Presenters\Forms\Form;
 use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
+use Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail;
 use Rhubarb\Scaffolds\Authentication\User;
 
 /**
@@ -45,7 +45,7 @@ class ResetPasswordPresenter extends Form
         $resetPasswordEmailClass = $this->resetPasswordInvitationEmailClassName;
 
         /**
-         * @var Email $resetPasswordEmail
+         * @var ResetPasswordInvitationEmail $resetPasswordEmail
          */
         $resetPasswordEmail = new $resetPasswordEmailClass($user);
         $resetPasswordEmail->addRecipient($user->Email, $user->FullName);
