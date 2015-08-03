@@ -22,6 +22,7 @@ use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Leaf\Presenters\Forms\Form;
 use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 
 class ConfirmResetPasswordPresenter extends Form
 {
@@ -35,15 +36,19 @@ class ConfirmResetPasswordPresenter extends Form
     protected function confirmPasswordReset()
     {
         if($this->NewPassword == $this->ConfirmNewPassword) {
-            $resetHash = $this->ItemIdentifier;
+            try {
+                $resetHash = $this->ItemIdentifier;
 
-            $user = User::fromPasswordResetHash($resetHash);
-            $user->setNewPassword($this->NewPassword);
-            $user->save();
+                $user = User::fromPasswordResetHash($resetHash);
+                $user->setNewPassword($this->NewPassword);
+                $user->save();
 
-            Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
+                Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
 
-            $this->activateMessage("PasswordReset");
+                $this->activateMessage("PasswordReset");
+            } catch (RecordNotFoundException $ex) {
+                $this->activateMessage("UserNotRecognised");
+            }
         } else {
             $this->activateMessage("PasswordsDontMatch");
         }
