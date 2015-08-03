@@ -34,16 +34,19 @@ class ConfirmResetPasswordPresenter extends Form
 
     protected function confirmPasswordReset()
     {
-        $resetHash = $this->ItemIdentifier;
+        if($this->NewPassword == $this->ConfirmNewPassword) {
+            $resetHash = $this->ItemIdentifier;
 
-        $user = User::fromPasswordResetHash($resetHash);
-        $user->setNewPassword($this->NewPassword);
-        $user->save();
+            $user = User::fromPasswordResetHash($resetHash);
+            $user->setNewPassword($this->NewPassword);
+            $user->save();
 
-        Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
+            Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
 
-        $this->activateMessage("PasswordReset");
-
+            $this->activateMessage("PasswordReset");
+        } else {
+            $this->activateMessage("PasswordsDontMatch");
+        }
     }
 
     protected function configureView()
