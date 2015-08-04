@@ -33,6 +33,11 @@ class ConfirmResetPasswordPresenter extends Form
         return new ConfirmResetPasswordView();
     }
 
+    /**
+     * @return bool|User
+     * @throws \Exception
+     * @throws \Rhubarb\Stem\Exceptions\ModelConsistencyValidationException
+     */
     protected function confirmPasswordReset()
     {
         if($this->NewPassword == $this->ConfirmNewPassword) {
@@ -47,13 +52,17 @@ class ConfirmResetPasswordPresenter extends Form
 
                 $this->activateMessage("PasswordReset");
 
-                $this->additionalConfirmationInstructions($user);
+                return $user;
 
             } catch (RecordNotFoundException $ex) {
                 $this->activateMessage("UserNotRecognised");
+
+                return false;
             }
         } else {
             $this->activateMessage("PasswordsDontMatch");
+
+            return false;
         }
     }
 
@@ -64,12 +73,5 @@ class ConfirmResetPasswordPresenter extends Form
         $this->view->attachEventHandler("ConfirmPasswordReset", function () {
             $this->confirmPasswordReset();
         });
-    }
-
-    /**
-     * @param User|null $user
-     */
-    protected function additionalConfirmationInstructions($user = null)
-    {
     }
 }
