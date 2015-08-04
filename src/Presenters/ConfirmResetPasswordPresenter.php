@@ -28,29 +28,39 @@ class ConfirmResetPasswordPresenter extends Form
 {
     use MessagePresenterTrait;
 
+    protected $user;
+
     protected function createView()
     {
         return new ConfirmResetPasswordView();
     }
 
+    /**
+     * @return bool
+     * @throws \Exception
+     * @throws \Rhubarb\Stem\Exceptions\ModelConsistencyValidationException
+     */
     protected function confirmPasswordReset()
     {
         if($this->NewPassword == $this->ConfirmNewPassword) {
             try {
                 $resetHash = $this->ItemIdentifier;
 
-                $user = User::fromPasswordResetHash($resetHash);
-                $user->setNewPassword($this->NewPassword);
-                $user->save();
+                $this->user = User::fromPasswordResetHash($resetHash);
+                $this->user->setNewPassword($this->NewPassword);
+                $this->user->save();
 
-                Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
+                Log::debug("Password reset for user `" . $this->user->Username . "`", "MVP");
 
                 $this->activateMessage("PasswordReset");
+                return true;
             } catch (RecordNotFoundException $ex) {
                 $this->activateMessage("UserNotRecognised");
+                return false;
             }
         } else {
             $this->activateMessage("PasswordsDontMatch");
+            return false;
         }
     }
 
