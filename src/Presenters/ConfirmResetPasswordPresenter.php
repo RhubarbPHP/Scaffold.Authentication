@@ -23,9 +23,6 @@ use Rhubarb\Leaf\Presenters\Forms\Form;
 use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
-use Rhubarb\Stem\Filters\Equals;
-use Unislim\WebApp\Model\Members\Member;
-use Unislim\WebApp\Model\Notification\Notification;
 
 class ConfirmResetPasswordPresenter extends Form
 {
