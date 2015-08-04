@@ -60,13 +60,23 @@ class ConfirmResetPasswordView extends HtmlView
      */
     protected function getMessages()
     {
-        return
-            [
-                "PasswordReset" => <<<PasswordReset
+        $messages = array();
+        $messages["PasswordReset"] = <<<PasswordReset
 <p>Thanks, your password has now been reset. If you still have difficulties logging in you
 should contact us for assistance. We will never ask you for your password, but we should
 be able to reset it for you.</p>
-PasswordReset
-            ];
+PasswordReset;
+
+        $messages["PasswordsDontMatch"] = <<<PasswordsDontMatch
+<p>Sorry, the password entries you made do not match.
+Please reset your password again.</p>
+PasswordsDontMatch;
+
+        $messages["UserNotRecognised"] = <<<PasswordsDontMatch
+<p>Sorry, the user account you are attempting to reset has not been recognised.
+Please click the 'forgot my password' link again.</p>
+PasswordsDontMatch;
+
+        return $messages;
     }
 }
