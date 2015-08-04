@@ -23,6 +23,9 @@ use Rhubarb\Leaf\Presenters\Forms\Form;
 use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Filters\Equals;
+use Unislim\WebApp\Model\Members\Member;
+use Unislim\WebApp\Model\Notification\Notification;
 
 class ConfirmResetPasswordPresenter extends Form
 {
@@ -46,6 +49,9 @@ class ConfirmResetPasswordPresenter extends Form
                 Log::debug("Password reset for user `" . $user->Username . "`", "MVP");
 
                 $this->activateMessage("PasswordReset");
+
+                $this->additionalConfirmationInstructions($user);
+
             } catch (RecordNotFoundException $ex) {
                 $this->activateMessage("UserNotRecognised");
             }
@@ -61,5 +67,12 @@ class ConfirmResetPasswordPresenter extends Form
         $this->view->attachEventHandler("ConfirmPasswordReset", function () {
             $this->confirmPasswordReset();
         });
+    }
+
+    /**
+     * @param User|null $user
+     */
+    protected function additionalConfirmationInstructions($user = null)
+    {
     }
 }
