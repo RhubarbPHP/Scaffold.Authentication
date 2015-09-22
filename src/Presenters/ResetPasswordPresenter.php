@@ -6,6 +6,7 @@ use Rhubarb\Leaf\Presenters\Forms\Form;
 use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
 use Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 
 /**
  * A presenter that allows a user to reset their password.
@@ -16,6 +17,7 @@ class ResetPasswordPresenter extends Form
 
     protected $usernameColumnName = "";
     protected $resetPasswordInvitationEmailClassName;
+    protected $usernameNotFound = false;
 
     public function __construct($usernameColumnName = "Username", $resetPasswordInvitationEmailClassName = '\Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail')
     {
@@ -35,21 +37,26 @@ class ResetPasswordPresenter extends Form
         parent::applyModelToView();
 
         $this->view->usernameColumnName = $this->usernameColumnName;
+        $this->view->usernameNotFound = $this->usernameNotFound;
     }
 
     protected function initiateResetPassword()
     {
-        $user = User::fromUsername($this->model->Username);
-        $user->generatePasswordResetHash();
+        try {
+            $user = User::fromUsername($this->model->Username);
+            $user->generatePasswordResetHash();
 
-        $resetPasswordEmailClass = $this->resetPasswordInvitationEmailClassName;
+            $resetPasswordEmailClass = $this->resetPasswordInvitationEmailClassName;
 
-        /**
-         * @var ResetPasswordInvitationEmail $resetPasswordEmail
-         */
-        $resetPasswordEmail = new $resetPasswordEmailClass($user);
-        $resetPasswordEmail->addRecipient($user->Email, $user->FullName);
-        $resetPasswordEmail->send();
+            /**
+             * @var ResetPasswordInvitationEmail $resetPasswordEmail
+             */
+            $resetPasswordEmail = new $resetPasswordEmailClass($user);
+            $resetPasswordEmail->addRecipient($user->Email, $user->FullName);
+            $resetPasswordEmail->send();
+        } catch ( RecordNotFoundException $er ){
+            $this->usernameNotFound = true;
+        }
     }
 
     protected function configureView()

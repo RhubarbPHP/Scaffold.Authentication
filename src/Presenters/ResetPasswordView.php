@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Presenters;
 
+use Gcd\Hub\Settings\Feedback;
 use Rhubarb\Leaf\Presenters\Controls\Buttons\Button;
 use Rhubarb\Leaf\Presenters\Controls\Text\TextBox\TextBox;
 use Rhubarb\Leaf\Views\HtmlView;
@@ -28,6 +29,7 @@ class ResetPasswordView extends HtmlView
     use MessageViewTrait;
 
     public $usernameColumnName = "Username";
+    public $usernameNotFound = false;
 
     public function createPresenters()
     {
