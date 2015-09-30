@@ -42,7 +42,7 @@ class ConfirmResetPasswordPresenter extends Form
      */
     protected function confirmPasswordReset()
     {
-        if($this->NewPassword == $this->ConfirmNewPassword) {
+        if($this->NewPassword == $this->ConfirmNewPassword && ! empty($this->NewPassword)) {
             try {
                 $resetHash = $this->ItemIdentifier;
 
@@ -58,6 +58,9 @@ class ConfirmResetPasswordPresenter extends Form
                 $this->activateMessage("UserNotRecognised");
                 return false;
             }
+        } else if (empty($this->NewPassword)) {
+            $this->activateMessage("PasswordEmpty");
+            return false;
         } else {
             $this->activateMessage("PasswordsDontMatch");
             return false;

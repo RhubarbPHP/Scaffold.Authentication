@@ -72,6 +72,11 @@ PasswordReset;
 Please reset your password again.</p>
 PasswordsDontMatch;
 
+        $messages["PasswordEmpty"] = <<<PasswordEmpty
+<p>Password and Confirm Password fields couldn't be empty</p>
+PasswordEmpty;
+
+
         $messages["UserNotRecognised"] = <<<PasswordsDontMatch
 <p>Sorry, the user account you are attempting to reset has not been recognised.
 Please click the 'forgot my password' link again.</p>
