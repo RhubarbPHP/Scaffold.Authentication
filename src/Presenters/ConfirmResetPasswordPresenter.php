@@ -42,14 +42,12 @@ class ConfirmResetPasswordPresenter extends Form
      */
     protected function confirmPasswordReset()
     {
-        $newPassword = $this->NewPassword;
-        $confirmPassword = $this->ConfirmNewPassword;
-        if($newPassword == $confirmPassword && ! empty($newPassword)) {
+        if($this->NewPassword == $this->ConfirmNewPassword && $this->NewPassword != "") {
             try {
                 $resetHash = $this->ItemIdentifier;
 
                 $this->user = User::fromPasswordResetHash($resetHash);
-                $this->user->setNewPassword($newPassword);
+                $this->user->setNewPassword($this->NewPassword);
                 $this->user->save();
 
                 Log::debug("Password reset for user `" . $this->user->Username . "`", "MVP");
@@ -60,7 +58,7 @@ class ConfirmResetPasswordPresenter extends Form
                 $this->activateMessage("UserNotRecognised");
                 return false;
             }
-        } else if (empty($newPassword)) {
+        } else if ($this->NewPassword == "") {
             $this->activateMessage("PasswordEmpty");
             return false;
         } else {
