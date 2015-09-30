@@ -73,7 +73,7 @@ Please reset your password again.</p>
 PasswordsDontMatch;
 
         $messages["PasswordEmpty"] = <<<PasswordEmpty
-<p>Password and Confirm Password fields couldn't be empty</p>
+<p>Password and Confirm Password fields cannot be empty</p>
 PasswordEmpty;
 
 
