@@ -34,23 +34,7 @@ class LoginProvider extends ModelLoginProvider
     {
         parent::initialiseDefaultValues();
 
-        // If we're not logged in, let's see if we can auto login using a saved token.
-        if (!$this->isLoggedIn()) {
-            $request = Context::currentRequest();
-
-            if ($request->cookie('lun') != "") {
-                $username = $request->cookie('lun');
-                $user = User::fromUsername($username);
-
-                $token = $request->cookie('ltk');
-
-                if ($user->validateToken($token)) {
-                    $this->LoggedIn = true;
-                    $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
-                    $this->storeSession();
-                }
-            }
-        }
+        $this->detectRememberMe();
     }
 
     public function rememberLogin()
@@ -77,5 +61,26 @@ class LoginProvider extends ModelLoginProvider
     {
         $provider = new static();
         return $provider->getModel();
+    }
+
+    protected function detectRememberMe()
+    {
+        // If we're not logged in, let's see if we can auto login using a saved token.
+        if (!$this->isLoggedIn()) {
+            $request = Context::currentRequest();
+
+            if ($request->cookie('lun') != "") {
+                $username = $request->cookie('lun');
+                $user = User::fromUsername($username);
+
+                $token = $request->cookie('ltk');
+
+                if ($user->validateToken($token)) {
+                    $this->LoggedIn = true;
+                    $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
+                    $this->storeSession();
+                }
+            }
+        }
     }
 }
