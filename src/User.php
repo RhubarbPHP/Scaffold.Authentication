@@ -44,7 +44,7 @@ class User extends Model
 
         $schema->addColumn(
             new AutoIncrement("UserID"),
-            new String("Username", 30),
+            new String("Username", 30, null),
             new String("Password", 200),
             new String("Forename", 80),
             new String("Surname", 80),
@@ -166,7 +166,7 @@ class User extends Model
 
     protected function setUsername($value)
     {
-        if ((!isset( $this->modelData["Username"]) || ( $value != $this->modelData["Username"] )) && !$this->isNewRecord()) {
+        if (isset( $this->modelData["Username"]) && $value != $this->modelData["Username"] && !$this->isNewRecord()) {
             throw new ModelException("Username cannot be changed after a user has been created.", $this);
         }
 
@@ -177,22 +177,25 @@ class User extends Model
     {
         $errors = parent::getConsistencyValidationErrors();
 
-        if ($this->isNewRecord()) {
-            // See if the username is in use.
-            $matches = self::find(new Equals("Username", $this->Username));
-            list($count) = $matches->calculateAggregates(new Count("Username"));
+        if($this->Enabled)
+        {
+            if ($this->isNewRecord()) {
+                // See if the username is in use.
+                $matches = self::find(new Equals("Username", $this->Username));
+                list($count) = $matches->calculateAggregates(new Count("Username"));
 
-            if ($count) {
-                $errors["Username"] = "This username is already in use";
+                if ($count) {
+                    $errors["Username"] = "This username is already in use";
+                }
             }
-        }
 
-        if (!$this->Username) {
-            $errors["Username"] = "The user must have a username";
-        }
+            if (!$this->Username) {
+                $errors["Username"] = "The user must have a username";
+            }
 
-        if ($this->FullName == "") {
-            $errors["Name"] = "The user must have a name";
+            if ($this->FullName == "") {
+                $errors["Name"] = "The user must have a name";
+            }
         }
 
         return $errors;
