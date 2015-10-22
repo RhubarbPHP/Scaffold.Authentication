@@ -24,6 +24,7 @@ use Rhubarb\Crown\Module;
 use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\MvpCollectionUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
+use Rhubarb\Stem\StemModule;
 
 class AuthenticationModule extends Module
 {
@@ -74,5 +75,15 @@ class AuthenticationModule extends Module
         $login->setPriority(10);
         $reset->setPriority(10);
         $validateLoginUrlHandler->setPriority(10);
+    }
+
+    /**
+     * Should your module require other modules, they should register the module here.
+     */
+    protected function registerDependantModules()
+    {
+        parent::registerDependantModules();
+
+        $this->registerModule(new StemModule());
     }
 }
