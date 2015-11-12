@@ -44,7 +44,7 @@ class ConfirmResetPasswordView extends HtmlView
     protected function printViewContent()
     {
         $this->printFieldset("Resetting your password",
-            "<p>Complete your password reset by entering a new password.</p>",
+            "<p class='c-form__help'>Complete your password reset by entering a new password.</p>",
             [
                 "Enter new password" => "NewPassword",
                 "Enter again to confirm" => "ConfirmNewPassword",
@@ -62,23 +62,23 @@ class ConfirmResetPasswordView extends HtmlView
     {
         $messages = array();
         $messages["PasswordReset"] = <<<PasswordReset
-<p>Thanks, your password has now been reset. If you still have difficulties logging in you
+<p class="c-alert">Thanks, your password has now been reset. If you still have difficulties logging in you
 should contact us for assistance. We will never ask you for your password, but we should
 be able to reset it for you.</p>
 PasswordReset;
 
         $messages["PasswordsDontMatch"] = <<<PasswordsDontMatch
-<p>Sorry, the password entries you made do not match.
+<p class="c-alert c-alert--error">Sorry, the password entries you made do not match.
 Please reset your password again.</p>
 PasswordsDontMatch;
 
         $messages["PasswordEmpty"] = <<<PasswordEmpty
-<p>Password and Confirm Password fields cannot be empty</p>
+<p class="c-alert c-alert--error">Password and Confirm Password fields cannot be empty</p>
 PasswordEmpty;
 
 
         $messages["UserNotRecognised"] = <<<PasswordsDontMatch
-<p>Sorry, the user account you are attempting to reset has not been recognised.
+<p class="c-alert c-alert--error">Sorry, the user account you are attempting to reset has not been recognised.
 Please click the 'forgot my password' link again.</p>
 PasswordsDontMatch;
 

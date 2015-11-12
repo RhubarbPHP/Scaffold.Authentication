@@ -46,7 +46,7 @@ class ResetPasswordView extends HtmlView
     public function printViewContent()
     {
         $this->printFieldset("Resetting your password",
-            "<div class='alert u-font-smaller'>
+            "<div class='c-form__help'>
 				<p>Initiating a password reset will send an email to the email address associated with the username
                 containing a link to reset your password.</p>
 				<p>Clicking on the link within 24 hours will allow you to enter a new password for your account.</p>
