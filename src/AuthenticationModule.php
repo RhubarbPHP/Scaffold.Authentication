@@ -29,7 +29,7 @@ use Rhubarb\Stem\StemModule;
 class AuthenticationModule extends Module
 {
     protected $urlToProtect;
-    protected $loginYrl;
+    protected $loginUrl;
 
     /**
      * Creates an instance of the Authentication module.
