@@ -28,7 +28,7 @@ use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrement;
 use Rhubarb\Stem\Schema\Columns\Boolean;
 use Rhubarb\Stem\Schema\Columns\DateTime;
-use Rhubarb\Stem\Schema\Columns\String;
+use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
 class User extends Model
@@ -44,15 +44,15 @@ class User extends Model
 
         $schema->addColumn(
             new AutoIncrement("UserID"),
-            new String("Username", 30, null),
-            new String("Password", 200),
-            new String("Forename", 80),
-            new String("Surname", 80),
-            new String("Email", 150),
-            new String("Token", 200),
+            new StringColumn("Username", 30, null),
+            new StringColumn("Password", 200),
+            new StringColumn("Forename", 80),
+            new StringColumn("Surname", 80),
+            new StringColumn("Email", 150),
+            new StringColumn("Token", 200),
             new DateTime("TokenExpiry"),
             new Boolean("Enabled", false),
-            new String("PasswordResetHash", 200),
+            new StringColumn("PasswordResetHash", 200),
             new DateTime("PasswordResetDate")
         );
 
