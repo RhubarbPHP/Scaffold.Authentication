@@ -25,10 +25,10 @@ use Rhubarb\Stem\Aggregates\Count;
 use Rhubarb\Stem\Exceptions\ModelException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Schema\Columns\AutoIncrement;
-use Rhubarb\Stem\Schema\Columns\Boolean;
-use Rhubarb\Stem\Schema\Columns\DateTime;
-use Rhubarb\Stem\Schema\Columns\String;
+use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
+use Rhubarb\Stem\Schema\Columns\BooleanColumn;
+use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
+use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
 class User extends Model
@@ -43,17 +43,17 @@ class User extends Model
         $schema = new ModelSchema("tblAuthenticationUser");
 
         $schema->addColumn(
-            new AutoIncrement("UserID"),
-            new String("Username", 30, null),
-            new String("Password", 200),
-            new String("Forename", 80),
-            new String("Surname", 80),
-            new String("Email", 150),
-            new String("Token", 200),
-            new DateTime("TokenExpiry"),
-            new Boolean("Enabled", false),
-            new String("PasswordResetHash", 200),
-            new DateTime("PasswordResetDate")
+            new AutoIncrementColumn("UserID"),
+            new StringColumn("Username", 30, null),
+            new StringColumn("Password", 200),
+            new StringColumn("Forename", 80),
+            new StringColumn("Surname", 80),
+            new StringColumn("Email", 150),
+            new StringColumn("Token", 200),
+            new DateTimeColumn("TokenExpiry"),
+            new BooleanColumn("Enabled", false),
+            new StringColumn("PasswordResetHash", 200),
+            new DateTimeColumn("PasswordResetDate")
         );
 
         $schema->labelColumnName = "FullName";
@@ -131,15 +131,15 @@ class User extends Model
     }
 
     /**
-     * Returns a unique string identifying this record in the user table.
+     * Returns a unique StringColumn identifying this record in the user table.
      *
      * @throws Exceptions\TokenException
-     * @return string
+     * @return StringColumn
      */
     private function getSavedPasswordTokenData()
     {
         if ($this->isNewRecord()) {
-            // We can't fulfil the request as we have no UserID which is required for the string.
+            // We can't fulfil the request as we have no UserID which is required for the StringColumn.
             throw new TokenException("The user has not been saved");
         }
 
@@ -150,7 +150,7 @@ class User extends Model
      * Creates a token for the user which allows for logging in via a cookie.
      *
      * @throws Exceptions\TokenException
-     * @return string The token.
+     * @return StringColumn The token.
      */
     public function createToken()
     {
