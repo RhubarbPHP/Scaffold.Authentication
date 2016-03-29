@@ -42,7 +42,7 @@ class ConfirmResetPasswordPresenter extends Form
      */
     protected function confirmPasswordReset()
     {
-        if($this->NewPassword == $this->ConfirmNewPassword && $this->NewPassword != "") {
+        if ($this->NewPassword == $this->ConfirmNewPassword && $this->NewPassword != "") {
             try {
                 $resetHash = $this->ItemIdentifier;
 

@@ -166,7 +166,7 @@ class User extends Model
 
     protected function setUsername($value)
     {
-        if (isset( $this->modelData["Username"]) && $value != $this->modelData["Username"] && !$this->isNewRecord()) {
+        if (isset($this->modelData["Username"]) && $value != $this->modelData["Username"] && !$this->isNewRecord()) {
             throw new ModelException("Username cannot be changed after a user has been created.", $this);
         }
 
@@ -177,8 +177,7 @@ class User extends Model
     {
         $errors = parent::getConsistencyValidationErrors();
 
-        if($this->Enabled)
-        {
+        if ($this->Enabled) {
             if ($this->isNewRecord()) {
                 // See if the username is in use.
                 $matches = self::find(new Equals("Username", $this->Username));

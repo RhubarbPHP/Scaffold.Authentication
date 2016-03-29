@@ -16,12 +16,12 @@ class ResetPasswordPresenterTest extends ModelUnitTestCase
     public function testResetPasswordButton()
     {
         /* @var $user \Rhubarb\Scaffolds\Authentication\User */
-        $user = SolutionSchema::GetModel("User");
+        $user = SolutionSchema::getModel("User");
         $user->Username = "timothy";
         $user->Forename = "test";
         $user->Surname = "guy";
         $user->Email = "test@nowhere.com";
-        $user->Save();
+        $user->save();
 
         $staff = new Staff();
         $staff->Forename = "test";
@@ -35,21 +35,21 @@ class ResetPasswordPresenterTest extends ModelUnitTestCase
         $presenter = new ResetPasswordPresenter();
         $view = new UnitTestView();
 
-        $presenter->AttachMockView($view);
+        $presenter->attachMockView($view);
         $presenter->model->Username = "timothy";
 
-        $view->SimulateEvent("ResetPassword");
+        $view->simulateEvent("ResetPassword");
 
-        $user->Reload();
+        $user->reload();
         $this->assertNotEmpty($user->PasswordResetHash);
         $this->assertEquals(date("Y-m-d"), $user->PasswordResetDate->format("Y-m-d"));
 
         // Check that an email is delivered to the user.
-        $email = UnitTestingEmailProvider::GetLastEmail();
+        $email = UnitTestingEmailProvider::getLastEmail();
 
-        $this->assertEquals("Your password reset invitation.", $email->GetSubject());
+        $this->assertEquals("Your password reset invitation.", $email->getSubject());
 
-        $this->assertEquals("test guy", $email->GetRecipients()["test@nowhere.com"]->name);
+        $this->assertEquals("test guy", $email->getRecipients()["test@nowhere.com"]->name);
 
     }
 
@@ -58,13 +58,13 @@ class ResetPasswordPresenterTest extends ModelUnitTestCase
         $presenter = new ResetPasswordPresenter();
         $view = new UnitTestView();
 
-        $presenter->AttachMockView($view);
+        $presenter->attachMockView($view);
         $presenter->model->Username = "timothy";
 
-        $view->SimulateEvent("ResetPassword");
+        $view->simulateEvent("ResetPassword");
 
         $presenter->test();
 
-        $this->assertTrue( $view->usernameNotFound );
+        $this->assertTrue($view->usernameNotFound);
     }
 }

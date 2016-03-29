@@ -13,27 +13,27 @@ class LoginProviderTest extends RhubarbTestCase
     public function testAutoLogin()
     {
         $user = new User();
-        $user->SetNewPassword("abc123");
+        $user->setNewPassword("abc123");
         $user->Username = "test";
         $user->Forename = "test";
         $user->Enabled = 1;
-        $user->Save();
+        $user->save();
 
-        $token = $user->CreateToken();
+        $token = $user->createToken();
 
-        Settings::DeleteSettingNamespace("LoginProvider");
+        Settings::deleteSettingNamespace("LoginProvider");
 
-        $request = Context::CurrentRequest();
-        $request->Cookie('lun', "test");
-        $request->Cookie('ltk', "anyoldvalue");
+        $request = Context::currentRequest();
+        $request->cookie('lun', "test");
+        $request->cookie('ltk', "anyoldvalue");
 
         $loginProvider = new LoginProvider();
 
         $this->assertFalse($loginProvider->isLoggedIn());
 
-        Settings::DeleteSettingNamespace("LoginProvider");
+        Settings::deleteSettingNamespace("LoginProvider");
 
-        $request->Cookie('ltk', $token);
+        $request->cookie('ltk', $token);
 
         $loginProvider = new LoginProvider();
 
@@ -43,16 +43,16 @@ class LoginProviderTest extends RhubarbTestCase
     public function testGetLoggedInUser()
     {
         $user = new User();
-        $user->SetNewPassword("abc123");
+        $user->setNewPassword("abc123");
         $user->Username = "test";
         $user->Forename = "test";
         $user->Enabled = 1;
-        $user->Save();
+        $user->save();
 
         $loginProvider = new LoginProvider();
-        $loginProvider->Login("test", "abc123");
+        $loginProvider->login("test", "abc123");
 
-        $pUser = LoginProvider::GetLoggedInUser();
+        $pUser = LoginProvider::getLoggedInUser();
 
         $this->assertEquals($user->UniqueIdentifier, $pUser->UniqueIdentifier);
     }

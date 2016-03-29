@@ -14,23 +14,23 @@ class ConfirmResetPasswordPresenterTest extends RhubarbTestCase
         $user = new User();
         $user->Username = "abc123";
         $user->Forename = "Billy";
-        $user->SetNewPassword("abc123");
-        $user->Save();
+        $user->setNewPassword("abc123");
+        $user->save();
 
         $oldPassword = $user->Password;
 
-        $hash = $user->GeneratePasswordResetHash();
+        $hash = $user->generatePasswordResetHash();
 
         $mvp = new ConfirmResetPasswordPresenter();
         $view = new UnitTestView();
-        $mvp->AttachMockView($view);
+        $mvp->attachMockView($view);
 
         $mvp->ItemIdentifier = $hash;
         $mvp->NewPassword = "def324";
 
-        $view->SimulateEvent("ConfirmPasswordReset");
+        $view->simulateEvent("ConfirmPasswordReset");
 
-        $user->Reload();
+        $user->reload();
 
         $this->assertNotEquals($oldPassword, $user->Password, "The password should have changed.");
     }

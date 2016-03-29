@@ -14,9 +14,9 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "test";
-        $user->Save();
+        $user->save();
 
-        $hash = $user->GeneratePasswordResetHash();
+        $hash = $user->generatePasswordResetHash();
 
         $user = new User($user->UniqueIdentifier);
 
@@ -33,9 +33,9 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "joebloggs";
-        $user->Save();
+        $user->save();
 
-        $user = User::FromUsername("joebloggs");
+        $user = User::fromUsername("joebloggs");
 
         $this->assertEquals("joebloggs", $user->Username);
     }
@@ -45,10 +45,10 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "joebloggs";
-        $user->SetNewPassword("abc123");
+        $user->setNewPassword("abc123");
 
-        $hashProvider = HashProvider::GetHashProvider();
-        $hashProvider->CompareHash("abc123", $user->Password);
+        $hashProvider = HashProvider::getHashProvider();
+        $hashProvider->compareHash("abc123", $user->Password);
     }
 
     public function testCreateToken()
@@ -56,18 +56,18 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "joebloggs2";
-        $user->SetNewPassword("abc123");
-        $user->Save();
+        $user->setNewPassword("abc123");
+        $user->save();
 
-        $user->TakeChangeSnapshot();
+        $user->takeChangeSnapshot();
 
-        $token = $user->CreateToken();
+        $token = $user->createToken();
 
         $this->assertNotEmpty($token, "No token returned");
         $this->assertGreaterThan(40, strlen($token), "The token isn't long enough to be valid.");
         $this->assertEquals($user->Token, $token, "The model wasn't updated with the token");
 
-        $user->Reload();
+        $user->reload();
 
         $this->assertEquals($user->Token, $token, "The model wasn't saved");
         $this->assertTrue(strtotime($user->TokenExpiry) > time(), "Token Expiry wasn't set.");
@@ -75,7 +75,7 @@ class UserTest extends RhubarbTestCase
         $this->setExpectedException(TokenException::class);
 
         $user = new User();
-        $user->CreateToken();
+        $user->createToken();
     }
 
     public function testValidateToken()
@@ -83,31 +83,31 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "goatsboats";
-        $user->SetNewPassword("abc123");
-        $user->Save();
+        $user->setNewPassword("abc123");
+        $user->save();
 
-        $token = $user->CreateToken();
+        $token = $user->createToken();
 
-        $this->assertTrue($user->ValidateToken($token), "The token didn't validate");
+        $this->assertTrue($user->validateToken($token), "The token didn't validate");
 
         // Fiddle with the tokens to simulate an attack.
 
         $token = "asdfklajsdfkjqpiowerioqwerjoqwejr;oqr";
         $user->Token = $token;
 
-        $this->assertFalse($user->ValidateToken($token), "Token vulnerable to attack by resetting to known value.");
+        $this->assertFalse($user->validateToken($token), "Token vulnerable to attack by resetting to known value.");
 
         $user = new User();
         $user->Forename = "test2";
         $user->Username = "goatsboats2";
-        $user->SetNewPassword("abc123");
-        $user->Save();
+        $user->setNewPassword("abc123");
+        $user->save();
 
-        $token = $user->CreateToken();
+        $token = $user->createToken();
 
         $user->TokenExpiry = date("Y-m-d H:i:s", time() - 100);
 
-        $this->assertFalse($user->ValidateToken($token), "The token should be expired.");
+        $this->assertFalse($user->validateToken($token), "The token should be expired.");
     }
 
     public function testPasswordResetClearsResetHash()
@@ -115,12 +115,12 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "gcdtest";
-        $user->GeneratePasswordResetHash();
-        $user->Save();
+        $user->generatePasswordResetHash();
+        $user->save();
         $this->assertNotEquals("", $user->PasswordResetHash);
 
-        $user->SetNewPassword("abc123");
-        $user->Save();
+        $user->setNewPassword("abc123");
+        $user->save();
         $this->assertEquals("", $user->PasswordResetHash);
     }
 }

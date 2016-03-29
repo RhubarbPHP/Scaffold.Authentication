@@ -60,7 +60,7 @@ class ConfirmResetPasswordView extends HtmlView
      */
     protected function getMessages()
     {
-        $messages = array();
+        $messages = [];
         $messages["PasswordReset"] = <<<PasswordReset
 <p class="c-alert">Thanks, your password has now been reset. If you still have difficulties logging in you
 should contact us for assistance. We will never ask you for your password, but we should

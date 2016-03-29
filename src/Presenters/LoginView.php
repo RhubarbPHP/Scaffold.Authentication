@@ -39,9 +39,9 @@ class LoginView extends \Rhubarb\Patterns\Mvp\BoilerPlates\Login\LoginView
                 <label class="c-form__label c-form__label--checkbox"><?= $this->presenters["RememberMe"] . " Remember Me"; ?></label>
             </div>
             <div class="c-form__actions-forgot">
-                <a href="/login/reset/">I've forgotten my password.</a>  
+                <a href="/login/reset/">I've forgotten my password.</a>
             </div>
         </div>
-    <?php
+        <?php
     }
 }

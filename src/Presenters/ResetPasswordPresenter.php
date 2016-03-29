@@ -54,7 +54,7 @@ class ResetPasswordPresenter extends Form
             $resetPasswordEmail = new $resetPasswordEmailClass($user);
             $resetPasswordEmail->addRecipient($user->Email, $user->FullName);
             $resetPasswordEmail->send();
-        } catch ( RecordNotFoundException $er ){
+        } catch (RecordNotFoundException $er) {
             $this->usernameNotFound = true;
         }
     }
