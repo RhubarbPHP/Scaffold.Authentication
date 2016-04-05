@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 class LoginProvider extends ModelLoginProvider
@@ -52,7 +53,7 @@ class LoginProvider extends ModelLoginProvider
     }
 
     /**
-     * Get's the User model currently logged in user
+     * Gets the User model currently logged in user
      *
      * @return User
      * @throws NotLoggedInException Thrown if the user isn't logged in.
@@ -71,14 +72,17 @@ class LoginProvider extends ModelLoginProvider
 
             if ($request->cookie('lun') != "") {
                 $username = $request->cookie('lun');
-                $user = User::fromUsername($username);
+                try {
+                    $user = User::fromUsername($username);
 
-                $token = $request->cookie('ltk');
+                    $token = $request->cookie('ltk');
 
-                if ($user->validateToken($token)) {
-                    $this->LoggedIn = true;
-                    $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
-                    $this->storeSession();
+                    if ($user->validateToken($token)) {
+                        $this->LoggedIn = true;
+                        $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
+                        $this->storeSession();
+                    }
+                } catch (RecordNotFoundException $ex) {
                 }
             }
         }
