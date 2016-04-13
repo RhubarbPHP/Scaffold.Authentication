@@ -47,7 +47,7 @@ class AuthenticationModule extends Module
         $this->loginUrl = $loginUrl;
 
         if ($loginProviderClassName != null) {
-            LoginProvider::setDefaultLoginProviderClassName($loginProviderClassName);
+            LoginProvider::setProviderClassName($loginProviderClassName);
         }
     }
 
@@ -66,7 +66,7 @@ class AuthenticationModule extends Module
 
         $login->setName("login");
 
-        $validateLoginUrlHandler = new ValidateLoginUrlHandler(LoginProvider::getDefaultLoginProvider(), $this->loginUrl);
+        $validateLoginUrlHandler = new ValidateLoginUrlHandler(LoginProvider::getProvider(), $this->loginUrl);
 
         $this->addUrlHandlers(
             [
@@ -83,10 +83,8 @@ class AuthenticationModule extends Module
     /**
      * Should your module require other modules, they should register the module here.
      */
-    protected function registerDependantModules()
+    protected function getModules()
     {
-        parent::registerDependantModules();
-
-        $this->registerModule(new StemModule());
+        return [new StemModule()];
     }
 }

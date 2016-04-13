@@ -18,9 +18,9 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
-use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
@@ -68,7 +68,7 @@ class LoginProvider extends ModelLoginProvider
     {
         // If we're not logged in, let's see if we can auto login using a saved token.
         if (!$this->isLoggedIn()) {
-            $request = Context::currentRequest();
+            $request = Request::current();
 
             if ($request->cookie('lun') != "") {
                 $username = $request->cookie('lun');

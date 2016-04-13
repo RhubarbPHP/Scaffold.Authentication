@@ -2,7 +2,6 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
-use Rhubarb\Crown\Context;
 use Rhubarb\Crown\Settings;
 use Rhubarb\Crown\Tests\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\LoginProvider;
