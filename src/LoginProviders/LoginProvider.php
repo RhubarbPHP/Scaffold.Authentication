@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication;
+namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
