@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 

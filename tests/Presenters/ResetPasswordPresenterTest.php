@@ -1,13 +1,13 @@
 <?php
 
 
-namespace Rhubarb\Scaffolds\Authentication\Tests\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Tests\Leaves;
 
 use Gcd\Hub\Emails\StaffSessionExpiry;
 use Gcd\Hub\Model\Staff\Staff;
 use Rhubarb\Crown\Tests\Fixtures\UnitTestingEmailProvider;
-use Rhubarb\Leaf\Tests\Fixtures\Presenters\UnitTestView;
-use Rhubarb\Scaffolds\Authentication\Presenters\ResetPasswordPresenter;
+use Rhubarb\Leaf\Tests\Fixtures\Leaves\UnitTestView;
+use Rhubarb\Scaffolds\Authentication\Leaves\ResetPassword;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\Tests\Fixtures\ModelUnitTestCase;
 
@@ -32,7 +32,7 @@ class ResetPasswordPresenterTest extends ModelUnitTestCase
         $user->StaffID = $staff->UniqueIdentifier;
         $user->save();
 
-        $presenter = new ResetPasswordPresenter();
+        $presenter = new ResetPassword();
         $view = new UnitTestView();
 
         $presenter->attachMockView($view);
@@ -55,7 +55,7 @@ class ResetPasswordPresenterTest extends ModelUnitTestCase
 
     public function testBadUsernameIsHandled()
     {
-        $presenter = new ResetPasswordPresenter();
+        $presenter = new ResetPassword();
         $view = new UnitTestView();
 
         $presenter->attachMockView($view);

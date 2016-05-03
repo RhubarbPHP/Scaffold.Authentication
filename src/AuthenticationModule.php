@@ -22,7 +22,7 @@ use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
 use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
-use Rhubarb\Leaf\UrlHandlers\MvpCollectionUrlHandler;
+use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\StemModule;
 
@@ -58,9 +58,11 @@ class AuthenticationModule extends Module
 
     protected function registerUrlHandlers()
     {
-        $reset = new MvpCollectionUrlHandler(__NAMESPACE__ . '\Presenters\ResetPasswordPresenter', __NAMESPACE__ . '\Presenters\ConfirmResetPasswordPresenter');
+        $reset = new LeafCollectionUrlHandler(
+            __NAMESPACE__ . '\Leaves\ResetPassword',
+            __NAMESPACE__ . '\Leaves\ConfirmResetPassword');
 
-        $login = new ClassMappedUrlHandler(__NAMESPACE__ . '\Presenters\LoginPresenter', [
+        $login = new ClassMappedUrlHandler(__NAMESPACE__ . '\Leaves\Login', [
             "reset/" => $reset
         ]);
 
@@ -76,7 +78,7 @@ class AuthenticationModule extends Module
 
         // Make sure that the login url handlers are given greater precedence than those of the application.
         $login->setPriority(10);
-        $reset->setPriority(10);
+        //$reset->setPriority(10);
         $validateLoginUrlHandler->setPriority(10);
     }
 

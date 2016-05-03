@@ -1,9 +1,11 @@
 <?php
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
-use Rhubarb\Leaf\Presenters\Forms\Form;
-use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
+use Rhubarb\Leaf\Leaves\Forms\Form;
+use Rhubarb\Leaf\Leaves\Leaf;
+use Rhubarb\Leaf\Leaves\LeafModel;
+use Rhubarb\Leaf\Leaves\MessagePresenterTrait;
 use Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
@@ -11,39 +13,27 @@ use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 /**
  * A presenter that allows a user to reset their password.
  */
-class ResetPasswordPresenter extends Form
+class ResetPassword extends Leaf
 {
-    use MessagePresenterTrait;
-
-    protected $usernameColumnName = "";
     protected $resetPasswordInvitationEmailClassName;
     protected $usernameNotFound = false;
 
-    public function __construct($usernameColumnName = "Username", $resetPasswordInvitationEmailClassName = '\Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail')
+    /**
+     * @var ResetPasswordModel
+     */
+    protected $model;
+
+    public function __construct($resetPasswordInvitationEmailClassName = '\Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail')
     {
         parent::__construct();
 
-        $this->usernameColumnName = $usernameColumnName;
         $this->resetPasswordInvitationEmailClassName = $resetPasswordInvitationEmailClassName;
-    }
-
-    public function createView()
-    {
-        return new ResetPasswordView();
-    }
-
-    protected function applyModelToView()
-    {
-        parent::applyModelToView();
-
-        $this->view->usernameColumnName = $this->usernameColumnName;
-        $this->view->usernameNotFound = $this->usernameNotFound;
     }
 
     protected function initiateResetPassword()
     {
         try {
-            $user = User::fromUsername($this->model->Username);
+            $user = User::fromUsername($this->model->username);
             $user->generatePasswordResetHash();
 
             $resetPasswordEmailClass = $this->resetPasswordInvitationEmailClassName;
@@ -54,19 +44,36 @@ class ResetPasswordPresenter extends Form
             $resetPasswordEmail = new $resetPasswordEmailClass($user);
             $resetPasswordEmail->addRecipient($user->Email, $user->FullName);
             $resetPasswordEmail->send();
+
+            $this->model->sent = true;
+
         } catch (RecordNotFoundException $er) {
-            $this->usernameNotFound = true;
+            $this->model->usernameNotFound = true;
         }
     }
 
-    protected function configureView()
+    /**
+     * Returns the name of the standard view used for this leaf.
+     *
+     * @return string
+     */
+    protected function getViewClass()
     {
-        parent::configureView();
+        return ResetPasswordView::class;
+    }
 
-        $this->view->attachEventHandler("ResetPassword", function () {
+    /**
+     * Should return a class that derives from LeafModel
+     *
+     * @return LeafModel
+     */
+    protected function createModel()
+    {
+        $model = new ResetPasswordModel();
+        $model->resetPasswordEvent->attachHandler(function(){
             $this->initiateResetPassword();
-
-            $this->activateMessage("Sent");
         });
+
+        return $model;
     }
 }

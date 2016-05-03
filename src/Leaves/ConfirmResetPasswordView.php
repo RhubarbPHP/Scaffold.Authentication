@@ -16,39 +16,55 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
-use Rhubarb\Leaf\Presenters\Controls\Buttons\Button;
-use Rhubarb\Leaf\Presenters\Controls\Text\Password\Password;
-use Rhubarb\Leaf\Views\HtmlView;
-use Rhubarb\Leaf\Views\MessageViewTrait;
+use Rhubarb\Leaf\Controls\Common\Buttons\Button;
+use Rhubarb\Leaf\Controls\Common\Text\PasswordTextBox;
+use Rhubarb\Leaf\Views\View;
 
-class ConfirmResetPasswordView extends HtmlView
+class ConfirmResetPasswordView extends View
 {
-    use MessageViewTrait;
+    /**
+     * @var ConfirmResetPasswordModel
+     */
+    protected $model;
 
-    public function createPresenters()
+    protected function createSubLeaves()
     {
-        parent::createPresenters();
+        parent::createSubLeaves();
 
-        $this->addPresenters(
-            new Password("NewPassword"),
-            new Password("ConfirmNewPassword"),
+        $this->registerSubLeaf(
+            new PasswordTextBox("NewPassword"),
+            new PasswordTextBox("ConfirmNewPassword"),
             new Button("ResetPassword", "Reset Password", function () {
-                $this->raiseEvent("ConfirmPasswordReset");
+                $this->model->confirmPasswordResetEvent->raise();
             })
         );
     }
 
     protected function printViewContent()
     {
-        $this->printFieldset("Resetting your password",
+        $messages = $this->getMessages();
+
+        if (isset($messages[$this->model->message])) {
+            $closure = $messages[$this->model->message];
+
+            if (is_callable($closure)) {
+                print $closure();
+            } else {
+                print $closure;
+            }
+        }
+
+        $this->layoutItemsWithContainer("Resetting your password",
+        [
             "<p class='c-form__help'>Complete your password reset by entering a new password.</p>",
             [
                 "Enter new password" => "NewPassword",
                 "Enter again to confirm" => "ConfirmNewPassword",
                 "" => "ResetPassword"
             ]
+        ]
         );
     }
 

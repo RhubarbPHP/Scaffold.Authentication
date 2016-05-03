@@ -16,24 +16,22 @@
  *  limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication\Presenters;
+namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\Logging\Log;
-use Rhubarb\Leaf\Presenters\Forms\Form;
-use Rhubarb\Leaf\Presenters\MessagePresenterTrait;
+use Rhubarb\Leaf\Leaves\Leaf;
+use Rhubarb\Leaf\Leaves\LeafModel;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 
-class ConfirmResetPasswordPresenter extends Form
+class ConfirmResetPassword extends Leaf
 {
-    use MessagePresenterTrait;
-
+    /**
+     * @var ConfirmResetPasswordModel
+     */
+    protected $model;
+    
     protected $user;
-
-    protected function createView()
-    {
-        return new ConfirmResetPasswordView();
-    }
 
     /**
      * @return bool
@@ -42,36 +40,50 @@ class ConfirmResetPasswordPresenter extends Form
      */
     protected function confirmPasswordReset()
     {
-        if ($this->NewPassword == $this->ConfirmNewPassword && $this->NewPassword != "") {
+        if ($this->model->NewPassword == $this->model->ConfirmNewPassword && $this->model->NewPassword != "") {
             try {
-                $resetHash = $this->ItemIdentifier;
+                $resetHash = $this->model->ItemIdentifier;
 
                 $this->user = User::fromPasswordResetHash($resetHash);
-                $this->user->setNewPassword($this->NewPassword);
+                $this->user->setNewPassword($this->model->NewPassword);
                 $this->user->save();
 
                 Log::debug("Password reset for user `" . $this->user->Username . "`", "MVP");
 
-                $this->activateMessage("PasswordReset");
+                $this->model->message = "PasswordReset";
                 return true;
             } catch (RecordNotFoundException $ex) {
-                $this->activateMessage("UserNotRecognised");
+                $this->model->message = "UserNotRecognised";
                 return false;
             }
-        } else if ($this->NewPassword == "") {
-            $this->activateMessage("PasswordEmpty");
+        } else if ($this->model->NewPassword == "") {
+            $this->model->message = "PasswordEmpty";
             return false;
         } else {
-            $this->activateMessage("PasswordsDontMatch");
+            $this->model->message = "PasswordsDontMatch";
             return false;
         }
     }
 
-    protected function configureView()
+    /**
+     * Returns the name of the standard view used for this leaf.
+     *
+     * @return string
+     */
+    protected function getViewClass()
     {
-        parent::configureView();
+        return ConfirmResetPasswordView::class;
+    }
 
-        $this->view->attachEventHandler("ConfirmPasswordReset", function () {
+    /**
+     * Should return a class that derives from LeafModel
+     *
+     * @return LeafModel
+     */
+    protected function createModel()
+    {
+        $model = new ConfirmResetPasswordModel();
+        $model->confirmPasswordResetEvent->attachHandler(function(){
             $this->confirmPasswordReset();
         });
     }
