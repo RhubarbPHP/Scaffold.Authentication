@@ -40,12 +40,12 @@ class ConfirmResetPassword extends Leaf
      */
     protected function confirmPasswordReset()
     {
-        if ($this->model->NewPassword == $this->model->ConfirmNewPassword && $this->model->NewPassword != "") {
+        if ($this->model->newPassword == $this->model->confirmNewPassword && $this->model->newPassword != "") {
             try {
-                $resetHash = $this->model->ItemIdentifier;
+                $resetHash = $this->model->itemIdentifier;
 
                 $this->user = User::fromPasswordResetHash($resetHash);
-                $this->user->setNewPassword($this->model->NewPassword);
+                $this->user->setNewPassword($this->model->newPassword);
                 $this->user->save();
 
                 Log::debug("Password reset for user `" . $this->user->Username . "`", "MVP");
@@ -56,7 +56,7 @@ class ConfirmResetPassword extends Leaf
                 $this->model->message = "UserNotRecognised";
                 return false;
             }
-        } else if ($this->model->NewPassword == "") {
+        } else if ($this->model->newPassword == "") {
             $this->model->message = "PasswordEmpty";
             return false;
         } else {

@@ -34,8 +34,8 @@ class ConfirmResetPasswordView extends View
         parent::createSubLeaves();
 
         $this->registerSubLeaf(
-            new PasswordTextBox("NewPassword"),
-            new PasswordTextBox("ConfirmNewPassword"),
+            new PasswordTextBox("newPassword"),
+            new PasswordTextBox("confirmNewPassword"),
             new Button("ResetPassword", "Reset Password", function () {
                 $this->model->confirmPasswordResetEvent->raise();
             })
@@ -60,8 +60,8 @@ class ConfirmResetPasswordView extends View
         [
             "<p class='c-form__help'>Complete your password reset by entering a new password.</p>",
             [
-                "Enter new password" => "NewPassword",
-                "Enter again to confirm" => "ConfirmNewPassword",
+                "Enter new password" => "newPassword",
+                "Enter again to confirm" => "confirmNewPassword",
                 "" => "ResetPassword"
             ]
         ]

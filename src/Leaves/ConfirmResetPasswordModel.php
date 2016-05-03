@@ -20,12 +20,12 @@ class ConfirmResetPasswordModel extends LeafModel
     /**
      * @var string
      */
-    public $NewPassword;
+    public $newPassword;
 
     /**
      * @var string
      */
-    public $ConfirmNewPassword;
+    public $confirmNewPassword;
 
     public function __construct()
     {
