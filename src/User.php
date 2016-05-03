@@ -25,11 +25,11 @@ use Rhubarb\Stem\Aggregates\Count;
 use Rhubarb\Stem\Exceptions\ModelException;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\AutoIncrement;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\Boolean;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\DateTime;
-use Rhubarb\Stem\Repositories\MySql\Schema\Columns\Varchar;
-use Rhubarb\Stem\Repositories\MySql\Schema\MySqlSchema;
+use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
+use Rhubarb\Stem\Schema\Columns\BooleanColumn;
+use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
+use Rhubarb\Stem\Schema\Columns\StringColumn;
+use Rhubarb\Stem\Schema\ModelSchema;
 
 class User extends Model
 {
@@ -40,20 +40,20 @@ class User extends Model
      */
     protected function createSchema()
     {
-        $schema = new MySqlSchema("tblAuthenticationUser");
+        $schema = new ModelSchema("tblAuthenticationUser");
 
         $schema->addColumn(
-            new AutoIncrement("UserID"),
-            new Varchar("Username", 30),
-            new Varchar("Password", 200),
-            new Varchar("Forename", 80),
-            new Varchar("Surname", 80),
-            new Varchar("Email", 150),
-            new Varchar("Token", 200),
-            new DateTime("TokenExpiry"),
-            new Boolean("Enabled", false),
-            new Varchar("PasswordResetHash", 200),
-            new DateTime("PasswordResetDate")
+            new AutoIncrementColumn("UserID"),
+            new StringColumn("Username", 30, null),
+            new StringColumn("Password", 200),
+            new StringColumn("Forename", 80),
+            new StringColumn("Surname", 80),
+            new StringColumn("Email", 150),
+            new StringColumn("Token", 200),
+            new DateTimeColumn("TokenExpiry"),
+            new BooleanColumn("Enabled", false),
+            new StringColumn("PasswordResetHash", 200),
+            new DateTimeColumn("PasswordResetDate")
         );
 
         $schema->labelColumnName = "FullName";
@@ -108,6 +108,11 @@ class User extends Model
         return self::findFirst(new Equals("PasswordResetHash", $hash));
     }
 
+    /**
+     * @param $username
+     * @return User
+     * @throws \Rhubarb\Stem\Exceptions\RecordNotFoundException
+     */
     public static function fromUsername($username)
     {
         return self::findFirst(new Equals("Username", $username));
@@ -126,15 +131,15 @@ class User extends Model
     }
 
     /**
-     * Returns a unique string identifying this record in the user table.
+     * Returns a unique StringColumn identifying this record in the user table.
      *
      * @throws Exceptions\TokenException
-     * @return string
+     * @return StringColumn
      */
     private function getSavedPasswordTokenData()
     {
         if ($this->isNewRecord()) {
-            // We can't fulfil the request as we have no UserID which is required for the string.
+            // We can't fulfil the request as we have no UserID which is required for the StringColumn.
             throw new TokenException("The user has not been saved");
         }
 
@@ -145,7 +150,7 @@ class User extends Model
      * Creates a token for the user which allows for logging in via a cookie.
      *
      * @throws Exceptions\TokenException
-     * @return string The token.
+     * @return StringColumn The token.
      */
     public function createToken()
     {
@@ -161,7 +166,7 @@ class User extends Model
 
     protected function setUsername($value)
     {
-        if (($value != $this->Username) && !$this->isNewRecord()) {
+        if (isset($this->modelData["Username"]) && $value != $this->modelData["Username"] && !$this->isNewRecord()) {
             throw new ModelException("Username cannot be changed after a user has been created.", $this);
         }
 
@@ -172,22 +177,24 @@ class User extends Model
     {
         $errors = parent::getConsistencyValidationErrors();
 
-        if ($this->isNewRecord()) {
-            // See if the username is in use.
-            $matches = self::find(new Equals("Username", $this->Username));
-            list($count) = $matches->calculateAggregates(new Count("Username"));
+        if ($this->Enabled) {
+            if ($this->isNewRecord()) {
+                // See if the username is in use.
+                $matches = self::find(new Equals("Username", $this->Username));
+                list($count) = $matches->calculateAggregates(new Count("Username"));
 
-            if ($count) {
-                $errors["Username"] = "This username is already in use";
+                if ($count) {
+                    $errors["Username"] = "This username is already in use";
+                }
             }
-        }
 
-        if (!$this->Username) {
-            $errors["Username"] = "The user must have a username";
-        }
+            if (!$this->Username) {
+                $errors["Username"] = "The user must have a username";
+            }
 
-        if ($this->FullName == "") {
-            $errors["Name"] = "The user must have a name";
+            if ($this->FullName == "") {
+                $errors["Name"] = "The user must have a name";
+            }
         }
 
         return $errors;

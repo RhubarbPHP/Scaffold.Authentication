@@ -19,7 +19,9 @@
 namespace Rhubarb\Scaffolds\Authentication;
 
 use Rhubarb\Crown\Context;
+use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 class LoginProvider extends ModelLoginProvider
@@ -33,27 +35,25 @@ class LoginProvider extends ModelLoginProvider
     {
         parent::initialiseDefaultValues();
 
-        // If we're not logged in, let's see if we can auto login using a saved token.
-        if (!$this->isLoggedIn()) {
-            $request = Context::currentRequest();
+        $this->detectRememberMe();
+    }
 
-            if ($request->Cookie('lun') != "") {
-                $username = $request->Cookie('lun');
-                $user = User::fromUsername($username);
+    public function rememberLogin()
+    {
+        $user = $this->getLoggedInUser();
+        HttpResponse::setCookie('lun', $this->getUsername());
+        HttpResponse::setCookie('ltk', $user->createToken());
+    }
 
-                $token = $request->Cookie('ltk');
-
-                if ($user->validateToken($token)) {
-                    $this->LoggedIn = true;
-                    $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
-                    $this->storeSession();
-                }
-            }
-        }
+    protected function onLogOut()
+    {
+        parent::onLogOut();
+        HttpResponse::unsetCookie('lun');
+        HttpResponse::unsetCookie('ltk');
     }
 
     /**
-     * Get's the User model currently logged in user
+     * Gets the User model currently logged in user
      *
      * @return User
      * @throws NotLoggedInException Thrown if the user isn't logged in.
@@ -62,5 +62,29 @@ class LoginProvider extends ModelLoginProvider
     {
         $provider = new static();
         return $provider->getModel();
+    }
+
+    protected function detectRememberMe()
+    {
+        // If we're not logged in, let's see if we can auto login using a saved token.
+        if (!$this->isLoggedIn()) {
+            $request = Context::currentRequest();
+
+            if ($request->cookie('lun') != "") {
+                $username = $request->cookie('lun');
+                try {
+                    $user = User::fromUsername($username);
+
+                    $token = $request->cookie('ltk');
+
+                    if ($user->validateToken($token)) {
+                        $this->LoggedIn = true;
+                        $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
+                        $this->storeSession();
+                    }
+                } catch (RecordNotFoundException $ex) {
+                }
+            }
+        }
     }
 }

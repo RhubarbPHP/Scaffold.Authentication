@@ -24,10 +24,12 @@ use Rhubarb\Crown\Module;
 use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\MvpCollectionUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
+use Rhubarb\Stem\StemModule;
 
 class AuthenticationModule extends Module
 {
     protected $urlToProtect;
+    protected $loginUrl;
 
     /**
      * Creates an instance of the Authentication module.
@@ -35,12 +37,14 @@ class AuthenticationModule extends Module
      * @param null $loginProviderClassName
      * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
      *                                  the entire URL tree.
+     * @param string $loginUrl The URL to redirect the user to for logging in
      */
-    public function __construct($loginProviderClassName = null, $urlToProtect = "/")
+    public function __construct($loginProviderClassName = null, $urlToProtect = "/", $loginUrl = "/login/")
     {
         parent::__construct();
 
         $this->urlToProtect = $urlToProtect;
+        $this->loginUrl = $loginUrl;
 
         if ($loginProviderClassName != null) {
             LoginProvider::setDefaultLoginProviderClassName($loginProviderClassName);
@@ -62,7 +66,7 @@ class AuthenticationModule extends Module
 
         $login->setName("login");
 
-        $validateLoginUrlHandler = new ValidateLoginUrlHandler(LoginProvider::getDefaultLoginProvider(), "/login/");
+        $validateLoginUrlHandler = new ValidateLoginUrlHandler(LoginProvider::getDefaultLoginProvider(), $this->loginUrl);
 
         $this->addUrlHandlers(
             [
@@ -74,5 +78,15 @@ class AuthenticationModule extends Module
         $login->setPriority(10);
         $reset->setPriority(10);
         $validateLoginUrlHandler->setPriority(10);
+    }
+
+    /**
+     * Should your module require other modules, they should register the module here.
+     */
+    protected function registerDependantModules()
+    {
+        parent::registerDependantModules();
+
+        $this->registerModule(new StemModule());
     }
 }

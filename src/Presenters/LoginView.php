@@ -34,14 +34,14 @@ class LoginView extends \Rhubarb\Patterns\Mvp\BoilerPlates\Login\LoginView
     protected function printAdditionalBeforeButton()
     {
         ?>
-        <div class="band-panels u-marg-top">
-            <div class="panel-1">
-                <label class="check-label">&nbsp;<?= $this->presenters["RememberMe"] . " Remember Me"; ?></label>
+        <div class="c-form__actions">
+            <div class="c-form__actions-remember">
+                <label class="c-form__label c-form__label--checkbox"><?= $this->presenters["RememberMe"] . " Remember Me"; ?></label>
             </div>
-            <div class="panel-2 u-align-right">
+            <div class="c-form__actions-forgot">
                 <a href="/login/reset/">I've forgotten my password.</a>
             </div>
         </div>
-    <?php
+        <?php
     }
 }
