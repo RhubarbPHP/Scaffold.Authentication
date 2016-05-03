@@ -20,6 +20,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Stem\Aggregates\Count;
 use Rhubarb\Stem\Exceptions\ModelException;
@@ -79,7 +80,7 @@ class User extends Model
      */
     public function generatePasswordResetHash()
     {
-        $hashProvider = HashProvider::getHashProvider();
+        $hashProvider = HashProvider::getProvider();
         $hash = sha1($hashProvider->createHash($this->UserID . uniqid(), uniqid("salt")));
 
         $this->PasswordResetHash = $hash;
@@ -91,7 +92,7 @@ class User extends Model
 
     public function setNewPassword($password)
     {
-        $provider = HashProvider::getHashProvider();
+        $provider = HashProvider::getProvider();
 
         $this->Password = $provider->createHash($password);
         $this->PasswordResetHash = "";
@@ -125,7 +126,7 @@ class User extends Model
      */
     public static function getLoggedInUser()
     {
-        $loginProvider = LoginProvider::getDefaultLoginProvider();
+        $loginProvider = LoginProvider::getProvider();
 
         return $loginProvider->getModel();
     }
@@ -154,7 +155,7 @@ class User extends Model
      */
     public function createToken()
     {
-        $hashProvider = HashProvider::getHashProvider();
+        $hashProvider = HashProvider::getProvider();
         $token = $hashProvider->createHash($this->getSavedPasswordTokenData(), sha1($this->Password));
 
         $this->Token = $token;
@@ -218,7 +219,7 @@ class User extends Model
             return false;
         }
 
-        $hashProvider = HashProvider::getHashProvider();
+        $hashProvider = HashProvider::getProvider();
         return $hashProvider->compareHash($this->getSavedPasswordTokenData(), $token);
     }
 }
