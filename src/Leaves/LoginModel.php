@@ -33,6 +33,8 @@ class LoginModel extends LeafModel
 
     public function __construct()
     {
+        parent::__construct();
+        
         $this->attemptLoginEvent = new Event();
     }
 
