@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Emails;
 
+use Rhubarb\Crown\DependencyInjection\Container;
 use Rhubarb\Crown\Sendables\Email\Email;
 use Rhubarb\Crown\Settings\WebsiteSettings;
 use Rhubarb\Scaffolds\Authentication\User;
@@ -83,6 +84,6 @@ link which when clicked will return you to the site and let you enter a new pass
     public static function fromArray($array)
     {
         $user = new User($array["UserID"]);
-        return new ResetPasswordInvitationEmail($user);
+        return Container::instance(ResetPasswordInvitationEmail::class,$user);
     }
 }
