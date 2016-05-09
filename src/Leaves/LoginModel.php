@@ -18,7 +18,7 @@ class LoginModel extends LeafModel
 
     public $rememberMe;
 
-    public $usernameColumnName;
+    public $identityColumnName;
 
     public $failed = false;
 

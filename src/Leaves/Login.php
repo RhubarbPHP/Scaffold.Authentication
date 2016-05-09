@@ -37,14 +37,14 @@ class Login extends Leaf
 
     /**
      * @param null $loginProviderClassName If not supplied, the default login provider will be used.
-     * @param string $usernameColumnName
+     * @param string $identityColumnName
      */
-    public function __construct($loginProviderClassName = null, $usernameColumnName = "Username")
+    public function __construct($loginProviderClassName = null, $identityColumnName = "Username")
     {
         parent::__construct();
 
         $this->loginProviderClassName = $loginProviderClassName;
-        $this->usernameColumnName = $usernameColumnName;
+        $this->model->identityColumnName = $identityColumnName;
     }
 
     /**

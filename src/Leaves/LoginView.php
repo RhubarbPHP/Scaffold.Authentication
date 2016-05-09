@@ -38,7 +38,7 @@ class LoginView extends View
         $this->registerSubLeaf(
             new TextBox("username"),
             new PasswordTextBox("password"),
-            new CheckBox("rememberMe"),
+            new Checkbox("rememberMe"),
             new Button("Login", "Login", function () {
                 $this->model->attemptLoginEvent->raise();
             })
@@ -54,7 +54,7 @@ class LoginView extends View
         ?>
         <fieldset class="c-form c-form--inline">
             <div class="c-form__group">
-                <label class="c-form__label"><?= ucwords($this->model->usernameColumnName); ?></label>
+                <label class="c-form__label"><?= ucwords($this->model->identityColumnName); ?></label>
                 <?= $this->leaves["username"]; ?>
             </div>
             <div class="c-form__group">
