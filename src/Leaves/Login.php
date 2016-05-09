@@ -25,6 +25,7 @@ use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Leaf\Leaves\Leaf;
 use Rhubarb\Leaf\Leaves\LeafModel;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 
 class Login extends Leaf
 {
@@ -39,12 +40,14 @@ class Login extends Leaf
      * @param null $loginProviderClassName If not supplied, the default login provider will be used.
      * @param string $identityColumnName
      */
-    public function __construct($loginProviderClassName = null, $identityColumnName = "Username")
+    public function __construct($loginProviderClassName = null)
     {
         parent::__construct();
 
+        $settings = AuthenticationSettings::singleton();
+
         $this->loginProviderClassName = $loginProviderClassName;
-        $this->model->identityColumnName = $identityColumnName;
+        $this->model->identityColumnName = $settings->identityColumnName;
     }
 
     /**

@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 

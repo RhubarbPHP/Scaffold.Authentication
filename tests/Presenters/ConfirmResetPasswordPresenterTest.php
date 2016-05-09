@@ -25,7 +25,7 @@ class ConfirmResetPasswordPresenterTest extends RhubarbTestCase
         $view = new UnitTestView();
         $mvp->attachMockView($view);
 
-        $mvp->ItemIdentifier = $hash;
+        $mvp->itemIdentifier = $hash;
         $mvp->NewPassword = "def324";
 
         $view->simulateEvent("ConfirmPasswordReset");

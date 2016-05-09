@@ -18,14 +18,23 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Emails;
 
-use Rhubarb\Crown\AppSettings;
-use Rhubarb\Crown\Email\TemplateEmail;
+use Rhubarb\Crown\Sendables\Email\Email;
+use Rhubarb\Crown\Settings\WebsiteSettings;
+use Rhubarb\Scaffolds\Authentication\User;
 
-class ResetPasswordInvitationEmail extends TemplateEmail
+class ResetPasswordInvitationEmail extends Email
 {
-    protected function getTextTemplateBody()
+    protected $user;
+
+    public function __construct(User $user)
     {
-        $appSettings = new AppSettings();
+        $this->user = $user;
+        $this->addRecipientByEmail($user->Email, $user->getFullName());
+    }
+
+    public function getText()
+    {
+        $settings = WebsiteSettings::singleton();
 
         return "You recently requested an invitation to reset your password. Below you will find a
 link which when clicked will return you to the site and let you enter a new password.
@@ -34,13 +43,13 @@ Please note you must do this within 24 hours or you will need to request a new i
 
 If you did not request this password reset invitation please disregard this email.
 
-" . $appSettings->AppBaseUrl . "/login/reset/{PasswordResetHash}/";
+" . $settings->absoluteWebsiteUrl. "/login/reset/".$this->user->PasswordResetHash."/";
 
     }
 
-    protected function getHtmlTemplateBody()
+    public function getHtml()
     {
-        $appSettings = new AppSettings();
+        $settings = WebsiteSettings::singleton();
 
         return "
 <h1>Password Reset Invitation</h1>
@@ -51,11 +60,29 @@ link which when clicked will return you to the site and let you enter a new pass
 
 <p>If you did not request this password reset invitation please disregard this email.</p>
 
-<p><a href=\"" . $appSettings->AppBaseUrl . "/login/reset/{PasswordResetHash}/\">Click to reset password</a></p>";
+<p><a href=\"" . $settings->absoluteWebsiteUrl. "/login/reset/".$this->user->PasswordResetHash."/\">Click to reset password</a></p>";
     }
 
-    protected function getSubjectTemplate()
+    /**
+     * @return string
+     */
+    public function getSubject()
     {
         return "Your password reset invitation.";
+    }
+    /**
+     * Expresses the sendable as an array allowing it to be serialised, stored and recovered later.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return ["UserID" => $this->user->UniqueIdentifier];
+    }
+
+    public static function fromArray($array)
+    {
+        $user = new User($array["UserID"]);
+        return new ResetPasswordInvitationEmail($user);
     }
 }

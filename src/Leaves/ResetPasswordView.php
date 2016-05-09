@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication\Leaves;
 use Rhubarb\Leaf\Controls\Common\Buttons\Button;
 use Rhubarb\Leaf\Controls\Common\Text\TextBox;
 use Rhubarb\Leaf\Views\View;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 
 class ResetPasswordView extends View
 {
@@ -52,17 +53,22 @@ class ResetPasswordView extends View
             print "<p>Thank you, a password reset invitation has been sent by the email address associated
 with the username `" . $this->model->username . "`</p>
 <p>When the email arrives it should contain a link which will let you supply a new password.</p>
-<p>You have 24 hours to complete the reset before the invitation will expire.";
+<p>You have 24 hours to complete the reset before the invitation will expire.</p>
+<p><a href='/login/'>Login</a></p>";
+
+            return;
         }
+
+        $settings = AuthenticationSettings::singleton();
 
         $this->layoutItemsWithContainer("Resetting your password",
             "<div class='c-form__help'>
-				<p>Initiating a password reset will send an email to the email address associated with the username
+				<p>Initiating a password reset will send an email to the email address associated with your account
                 containing a link to reset your password.</p>
 				<p>Clicking on the link within 24 hours will allow you to enter a new password for your account.</p>
 			</div>",
             [
-                "username",
+                $settings->identityColumnName => "username",
                 "" => "ResetPassword"
             ]
         );

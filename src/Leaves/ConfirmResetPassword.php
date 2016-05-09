@@ -86,5 +86,7 @@ class ConfirmResetPassword extends Leaf
         $model->confirmPasswordResetEvent->attachHandler(function(){
             $this->confirmPasswordReset();
         });
+
+        return $model;
     }
 }

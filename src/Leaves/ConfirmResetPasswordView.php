@@ -54,17 +54,17 @@ class ConfirmResetPasswordView extends View
             } else {
                 print $closure;
             }
+
+            return;
         }
 
         $this->layoutItemsWithContainer("Resetting your password",
-        [
             "<p class='c-form__help'>Complete your password reset by entering a new password.</p>",
             [
                 "Enter new password" => "newPassword",
                 "Enter again to confirm" => "confirmNewPassword",
                 "" => "ResetPassword"
             ]
-        ]
         );
     }
 
@@ -94,6 +94,11 @@ PasswordEmpty;
 
         $messages["UserNotRecognised"] = <<<PasswordsDontMatch
 <p class="c-alert c-alert--error">Sorry, the user account you are attempting to reset has not been recognised.
+Please click the 'forgot my password' link again.</p>
+PasswordsDontMatch;
+
+        $messages["HashInvalid"] = <<<PasswordsDontMatch
+<p class="c-alert c-alert--error">Sorry, the reset link has expired or is not recognised.
 Please click the 'forgot my password' link again.</p>
 PasswordsDontMatch;
 

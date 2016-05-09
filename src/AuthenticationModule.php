@@ -38,6 +38,7 @@ class AuthenticationModule extends Module
      * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
      *                                  the entire URL tree.
      * @param string $loginUrl The URL to redirect the user to for logging in
+     * @param string $identityColumnName The name of the column in the user table storing the login identity.
      */
     public function __construct($loginProviderClassName = null, $urlToProtect = "/", $loginUrl = "/login/")
     {
