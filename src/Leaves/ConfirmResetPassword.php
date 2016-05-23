@@ -30,7 +30,7 @@ class ConfirmResetPassword extends Leaf
      * @var ConfirmResetPasswordModel
      */
     protected $model;
-    
+
     protected $user;
 
     /**
@@ -42,7 +42,7 @@ class ConfirmResetPassword extends Leaf
     {
         if ($this->model->newPassword == $this->model->confirmNewPassword && $this->model->newPassword != "") {
             try {
-                $resetHash = $this->model->itemIdentifier;
+                $resetHash = $this->itemIdentifier;
 
                 $this->user = User::fromPasswordResetHash($resetHash);
                 $this->user->setNewPassword($this->model->newPassword);
