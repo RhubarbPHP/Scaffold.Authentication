@@ -22,7 +22,6 @@ use Rhubarb\Leaf\Presenters\Controls\Buttons\Button;
 use Rhubarb\Leaf\Presenters\Controls\Text\Password\Password;
 use Rhubarb\Leaf\Views\HtmlView;
 use Rhubarb\Leaf\Views\MessageViewTrait;
-use string;
 
 class ConfirmResetPasswordView extends HtmlView
 {
