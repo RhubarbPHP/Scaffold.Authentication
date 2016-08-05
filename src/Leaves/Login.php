@@ -22,6 +22,7 @@ use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Leaf\Leaves\Leaf;
 use Rhubarb\Leaf\Leaves\LeafModel;
@@ -100,6 +101,22 @@ class Login extends Leaf
         if ( $login->isLoggedIn() ){
             $this->onSuccess();
         }
+    }
+
+    protected function parseRequest(WebRequest $request)
+    {
+        $login = $this->getLoginProvider();
+
+        $logout = $request->get("logout");
+        if (isset($logout)) {
+            $login->logOut();
+        }
+
+        if ($login->isLoggedIn()) {
+            $this->onSuccess();
+        }
+
+        parent::parseRequest($request);
     }
 
     /**
