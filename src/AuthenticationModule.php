@@ -77,6 +77,15 @@ class AuthenticationModule extends Module
                 $this->urlToProtect => $validateLoginUrlHandler
             ]);
 
+        $logout = new ClassMappedUrlHandler(__NAMESPACE__ . '\Leaves\Logout');
+
+        $logout->setName("logout");
+
+        $this->addUrlHandlers(
+            [
+                "/logout/" => $logout
+            ]);
+
         // Make sure that the login url handlers are given greater precedence than those of the application.
         $login->setPriority(10);
         //$reset->setPriority(10);
