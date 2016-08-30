@@ -73,7 +73,7 @@ class AuthenticationModule extends Module
 
         $this->addUrlHandlers(
             [
-                "/login/" => $login,
+                $this->loginUrl => $login,
                 $this->urlToProtect => $validateLoginUrlHandler
             ]);
 
