@@ -116,10 +116,11 @@ class User extends Model
      * @param $username
      * @return User
      * @throws \Rhubarb\Stem\Exceptions\RecordNotFoundException
+     * @deprecated
      */
     public static function fromUsername($username)
     {
-        return self::findFirst(new Equals("Username", $username));
+        return self::fromIdentifierColumnValue($username);
     }
 
     /**
