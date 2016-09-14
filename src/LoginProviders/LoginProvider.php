@@ -21,14 +21,25 @@ namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 class LoginProvider extends ModelLoginProvider
 {
-    public function __construct($modelClassName = "User", $usernameColumnName = "Username", $passwordColumnName = "Password", $activeColumnName = "Enabled")
+    /**
+     * @param string $modelClassName
+     * @param string|null $usernameColumnName Leave null to inherit from AuthenticationSettings::$identifyColumnName (Username by default)
+     * @param string $passwordColumnName
+     * @param string $activeColumnName
+     */
+    public function __construct($modelClassName = "User", $usernameColumnName = null, $passwordColumnName = "Password", $activeColumnName = "Enabled")
     {
+        if($usernameColumnName === null) {
+            $settings = AuthenticationSettings::singleton();
+            $usernameColumnName = $settings->identityColumnName;
+        }
         parent::__construct($modelClassName, $usernameColumnName, $passwordColumnName, $activeColumnName);
     }
 

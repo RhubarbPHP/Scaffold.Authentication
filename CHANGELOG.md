@@ -2,11 +2,12 @@
 
 ### 1.0.x
 
+* Changed:  LoginProvider uses this modules own AuthenticationSettings object to determine the default identity column.
 
 ### 1.0.1
 
-Fixed:		The login url passed to the module constructor wasn't being used for the URL handler.
+* Fixed:		The login url passed to the module constructor wasn't being used for the URL handler.
 
 ### 1.0.0
 
-Changed:        Changes for 1.0.0 of Leaf
+* Changed:        Changes for 1.0.0 of Leaf
