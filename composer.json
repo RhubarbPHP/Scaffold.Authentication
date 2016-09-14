@@ -13,7 +13,8 @@
   "require": {
     "rhubarbphp/rhubarb": "*",
     "rhubarbphp/module-stem": "*",
-    "rhubarbphp/module-leaf": "*"
+    "rhubarbphp/module-leaf": "*",
+    "rhubarbphp/module-leaf-common-controls": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "3.*"

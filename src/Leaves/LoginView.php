@@ -36,13 +36,15 @@ class LoginView extends View
         parent::createSubLeaves();
 
         $this->registerSubLeaf(
-            new TextBox("username"),
+            $username = new TextBox("username"),
             new PasswordTextBox("password"),
             new Checkbox("rememberMe"),
             new Button("Login", "Login", function () {
                 $this->model->attemptLoginEvent->raise();
             })
         );
+
+        $username->addHtmlAttribute('autofocus', 'autofocus');
     }
 
     public function printViewContent()
