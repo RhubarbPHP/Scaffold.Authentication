@@ -123,6 +123,16 @@ class User extends Model
     }
 
     /**
+     * @param mixed $value
+     * @return Model|static
+     */
+    public static function fromIdentifierColumnValue($value)
+    {
+        $settings = AuthenticationSettings::singleton();
+        return self::findFirst(new Equals($settings->identityColumnName, $value));
+    }
+
+    /**
      * Returns the logged in User model
      *
      * @throws NotLoggedInException
