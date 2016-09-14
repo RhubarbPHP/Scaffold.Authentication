@@ -2,6 +2,7 @@
 
 ### 1.0.x
 
+* Added:        User identity column support to remember me
 * Deprecated:   Loading users from Username, should be loaded from identity column value
 * Added:        Method to load users from an identity column value
 * Added:        User model validation to ensure that the identifier is not used by any other active record.

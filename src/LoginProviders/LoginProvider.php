@@ -85,7 +85,7 @@ class LoginProvider extends ModelLoginProvider
             if ($request->cookie('lun') != "") {
                 $username = $request->cookie('lun');
                 try {
-                    $user = User::fromUsername($username);
+                    $user = User::fromIdentifierColumnValue($username);
 
                     $token = $request->cookie('ltk');
 
