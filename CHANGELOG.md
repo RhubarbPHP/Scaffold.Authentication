@@ -4,6 +4,7 @@
 
 ### 1.0.2
 
+* Added:        Autofocus first credentials field on login form
 * Added:        User identity column support to remember me
 * Added:        User identity column support to reset password 
 * Deprecated:   Loading users from Username, should be loaded from identity column value
