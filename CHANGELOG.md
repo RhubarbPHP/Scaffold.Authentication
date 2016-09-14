@@ -2,7 +2,10 @@
 
 ### 1.0.x
 
+### 1.0.2
+
 * Added:        User identity column support to remember me
+* Added:        User identity column support to reset password 
 * Deprecated:   Loading users from Username, should be loaded from identity column value
 * Added:        Method to load users from an identity column value
 * Added:        User model validation to ensure that the identifier is not used by any other active record.

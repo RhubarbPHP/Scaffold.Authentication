@@ -25,7 +25,7 @@ class ResetPassword extends Leaf
     protected function initiateResetPassword()
     {
         try {
-            $user = User::fromUsername($this->model->username);
+            $user = User::fromIdentifierColumnValue($this->model->username);
             $user->generatePasswordResetHash();
 
             /**
