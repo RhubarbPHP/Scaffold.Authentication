@@ -23,9 +23,11 @@ use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
-use Rhubarb\Stem\Aggregates\Count;
 use Rhubarb\Stem\Exceptions\ModelException;
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
+use Rhubarb\Stem\Filters\Not;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
@@ -174,14 +176,21 @@ class User extends Model
             $settings = AuthenticationSettings::singleton();
             $identityColumnName = $settings->identityColumnName;
 
-            if ($this->isNewRecord()) {
-                // See if the username is in use.
-                $matches = self::find(new Equals($identityColumnName, $this->$identityColumnName));
-                list($count) = $matches->calculateAggregates(new Count($identityColumnName));
-
-                if ($count) {
-                    $errors[$identityColumnName] = "This ".$identityColumnName." is already in use";
-                }
+            // See if the identity is in use.
+            $identityFilter = new Equals($identityColumnName, $this->$identityColumnName);
+            if (!$this->isNewRecord()) {
+                $identityFilter = new AndGroup([
+                    $identityFilter,
+                    new Not(new Equals($this->getUniqueIdentifierColumnName(), $this->getUniqueIdentifier()))
+                ]);
+            }
+            try
+            {
+                self::findFirst($identityFilter);
+                $errors[$identityColumnName] = "This ".$identityColumnName." is already in use";
+            }
+            catch(RecordNotFoundException $ex) {
+                // all is well!
             }
 
             if (!$this->$identityColumnName) {

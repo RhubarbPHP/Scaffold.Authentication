@@ -2,6 +2,7 @@
 
 ### 1.0.x
 
+* Added:    User model validation to ensure that the identifier is not used by any other active record.
 * Removed:  Restriction on changing identifier column value after model is created
 * Changed:  LoginProvider uses this modules own AuthenticationSettings object to determine the default identity column.
 
