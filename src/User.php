@@ -166,15 +166,6 @@ class User extends Model
         return $token;
     }
 
-    protected function setUsername($value)
-    {
-        if (isset($this->modelData["Username"]) && $value != $this->modelData["Username"] && !$this->isNewRecord()) {
-            throw new ModelException("Username cannot be changed after a user has been created.", $this);
-        }
-
-        $this->modelData["Username"] = $value;
-    }
-
     protected function getConsistencyValidationErrors()
     {
         $errors = parent::getConsistencyValidationErrors();

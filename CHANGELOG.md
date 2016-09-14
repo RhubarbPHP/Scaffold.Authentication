@@ -2,6 +2,7 @@
 
 ### 1.0.x
 
+* Removed:  Restriction on changing identifier column value after model is created
 * Changed:  LoginProvider uses this modules own AuthenticationSettings object to determine the default identity column.
 
 ### 1.0.1
