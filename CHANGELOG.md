@@ -1,6 +1,10 @@
 # Change Log
 
-### 1.0.x
+### 1.1.x
+
+### 1.1.0
+
+* Added:    Support for multiple URLs protected by different LoginProviders
 
 ### 1.0.2
 
