@@ -50,7 +50,7 @@ class LoginView extends View
     public function printViewContent()
     {
         if ($this->model->failed) {
-            print "<div class='c-alert c-alert--error'>Sorry, this username and password combination could not be found, please check and try again.</div>";
+            print '<div class="c-alert c-alert--error">Sorry, this username and password combination could not be found, please check and try again.</div>';
         }
 
         ?>
@@ -66,10 +66,10 @@ class LoginView extends View
 
             <div class="c-form__actions">
             <div class="c-form__actions-remember">
-                <label class="c-form__label c-form__label--checkbox"><?= $this->leaves["rememberMe"] . " Remember Me"; ?></label>
+                <label class="c-form__label c-form__label--checkbox"><?= $this->leaves["rememberMe"]; ?> Remember Me</label>
             </div>
             <div class="c-form__actions-forgot">
-                <a href="/login/reset/">I've forgotten my password.</a>
+                <a href="<?= $this->model->passwordResetUrl; ?>">I've forgotten my password.</a>
             </div>
             </div>
 

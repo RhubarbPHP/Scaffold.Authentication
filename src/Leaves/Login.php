@@ -22,15 +22,15 @@ use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Leaf\Leaves\Leaf;
-use Rhubarb\Leaf\Leaves\LeafModel;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 
 class Login extends Leaf
 {
-    private $loginProviderClassName = "";
+    protected $loginProviderClassName = "";
 
     /**
      * @var LoginModel
@@ -38,8 +38,7 @@ class Login extends Leaf
     protected $model;
 
     /**
-     * @param null $loginProviderClassName If not supplied, the default login provider will be used.
-     * @param string $identityColumnName
+     * @param string $loginProviderClassName If not supplied, the default login provider will be used.
      */
     public function __construct($loginProviderClassName = null)
     {
@@ -60,7 +59,7 @@ class Login extends Leaf
     {
         $provider = $this->loginProviderClassName;
 
-        if ($provider == ""){
+        if ($provider == "") {
             return LoginProvider::getProvider();
         }
 
@@ -83,24 +82,6 @@ class Login extends Leaf
     protected function getDefaultSuccessUrl()
     {
         return "/";
-    }
-
-    /**
-     * Called just before the view is rendered.
-     *
-     * Guaranteed to only be called once during a normal page execution.
-     */
-    protected function beforeRenderView()
-    {
-        $login = $this->getLoginProvider();
-
-        if (isset($_GET["logout"])) {
-            $login->logOut();
-        }
-
-        if ( $login->isLoggedIn() ){
-            $this->onSuccess();
-        }
     }
 
     protected function parseRequest(WebRequest $request)
@@ -132,39 +113,52 @@ class Login extends Leaf
     /**
      * Should return a class that derives from LeafModel
      *
-     * @return LeafModel
+     * @return LoginModel
      */
     protected function createModel()
     {
-        $model = new LoginModel();
+        return new LoginModel();
+    }
 
-        if (isset($_GET["rd"])) {
-            $model->redirectUrl = $_GET["rd"];
+    protected function onModelCreated()
+    {
+        /** @var WebRequest $request */
+        $request = Request::current();
+        $redirectUrl = $request->get('rd');
+        if ($redirectUrl) {
+            $redirectUrl = urldecode($redirectUrl);
+            $this->model->redirectUrl = $redirectUrl;
         }
 
-        $model->attemptLoginEvent->attachHandler(
-            function () {
-                $login = $this->getLoginProvider();
+        $this->model->attemptLoginEvent->attachHandler(function () {
+            $login = $this->getLoginProvider();
 
-                try {
-                    if ($login->login($this->model->username, $this->model->password)) {
+            try {
+                if ($login->login($this->model->username, $this->model->password)) {
 
-                        if ($this->model->rememberMe) {
-                            $login = $this->getLoginProvider();
-                            $login->rememberLogin();
-                        }
-
-                        $this->onSuccess();
+                    if ($this->model->rememberMe) {
+                        $login = $this->getLoginProvider();
+                        $login->rememberLogin();
                     }
-                } catch (LoginDisabledException $er) {
-                    $this->model->disabled = true;
-                    $this->model->failed = true;
-                } catch (LoginFailedException $er) {
-                    $this->model->failed = true;
-                }
-            }
-        );
 
-        return $model;
+                    $this->onSuccess();
+                }
+            } catch (LoginDisabledException $er) {
+                $this->model->disabled = true;
+                $this->model->failed = true;
+            } catch (LoginFailedException $er) {
+                $this->model->failed = true;
+            }
+        });
+    }
+
+    /**
+     * Allows setting the URL for the forgotten password link on the login form
+     *
+     * @param $url
+     */
+    public function setPasswordResetUrl($url)
+    {
+        $this->model->passwordResetUrl = $url;
     }
 }
