@@ -26,6 +26,6 @@ class DatabaseSchema extends SolutionSchema
     {
         parent::__construct($version);
 
-        $this->addModel("User", "Rhubarb\Scaffolds\Authentication\User");
+        $this->addModel('User', User::class);
     }
 }

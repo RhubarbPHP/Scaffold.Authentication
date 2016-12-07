@@ -1,6 +1,11 @@
 # Change Log
 
-### 1.0.x
+### 1.1.x
+
+### 1.1.0
+
+* Changed:      Model initialisation to allow easily overriding the model class
+* Added:        Support for multiple URLs protected by different LoginProviders
 
 ### 1.0.2
 
@@ -19,4 +24,4 @@
 
 ### 1.0.0
 
-* Changed:        Changes for 1.0.0 of Leaf
+* Changed:      Changes for 1.0.0 of Leaf

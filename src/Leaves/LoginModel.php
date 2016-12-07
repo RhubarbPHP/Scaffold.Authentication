@@ -47,6 +47,8 @@ class LoginModel extends LeafModel
      */
     public $attemptLoginEvent;
 
+    public $passwordResetUrl = '/login/reset/';
+
     public function __construct()
     {
         parent::__construct();
@@ -54,11 +56,10 @@ class LoginModel extends LeafModel
         $this->attemptLoginEvent = new Event();
     }
 
-
     protected function getExposableModelProperties()
     {
         $list = parent::getExposableModelProperties();
-        $list[] = "RedirectUrl";
+        $list[] = 'redirectUrl';
 
         return $list;
     }

@@ -18,19 +18,16 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
-use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
-use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
+use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
+use Rhubarb\Scaffolds\Authentication\UrlHandlers\CallableUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
 use Rhubarb\Stem\StemModule;
 
 class AuthenticationModule extends Module
 {
-    protected $urlToProtect;
-    protected $loginUrl;
-
     /**
      * Creates an instance of the Authentication module.
      *
@@ -38,58 +35,70 @@ class AuthenticationModule extends Module
      * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
      *                                  the entire URL tree.
      * @param string $loginUrl The URL to redirect the user to for logging in
-     * @param string $identityColumnName The name of the column in the user table storing the login identity.
+     * @internal param string $identityColumnName The name of the column in the user table storing the login identity.
      */
-    public function __construct($loginProviderClassName = null, $urlToProtect = "/", $loginUrl = "/login/")
+    public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/')
     {
         parent::__construct();
 
-        $this->urlToProtect = $urlToProtect;
-        $this->loginUrl = $loginUrl;
-
-        if ($loginProviderClassName != null) {
-            LoginProvider::setProviderClassName($loginProviderClassName);
+        if ($loginProviderClassName !== null) {
+            $this->registerProtectedUrl(new ProtectedUrl(
+                $urlToProtect,
+                $loginProviderClassName,
+                $loginUrl
+            ));
         }
     }
 
+    public function registerProtectedUrl(ProtectedUrl $urlToProtect)
+    {
+        $this->protectedUrls[] = $urlToProtect;
+    }
+
+    /** @var ProtectedUrl[] */
+    private $protectedUrls = [];
+
     public function initialise()
     {
-        SolutionSchema::registerSchema("Authentication", __NAMESPACE__ . '\DatabaseSchema');
+        SolutionSchema::registerSchema('Authentication', DatabaseSchema::class);
     }
 
     protected function registerUrlHandlers()
     {
-        $reset = new LeafCollectionUrlHandler(
-            __NAMESPACE__ . '\Leaves\ResetPassword',
-            __NAMESPACE__ . '\Leaves\ConfirmResetPassword');
+        foreach ($this->protectedUrls as $url) {
 
-        $login = new ClassMappedUrlHandler(__NAMESPACE__ . '\Leaves\Login', [
-            "reset/" => $reset
-        ]);
+            $provider = $url->loginProviderClassName;
 
-        $login->setName("login");
-
-        $validateLoginUrlHandler = new ValidateLoginUrlHandler(LoginProvider::getProvider(), $this->loginUrl);
-
-        $this->addUrlHandlers(
-            [
-                $this->loginUrl => $login,
-                $this->urlToProtect => $validateLoginUrlHandler
+            $this->addUrlHandlers([
+                $url->loginUrl => $login = new CallableUrlHandler(function () use ($url) {
+                    $className = $url->loginLeafClassName;
+                    return new $className($url->loginProviderClassName);
+                }, [
+                    $url->resetChildUrl => $reset = new LeafCollectionUrlHandler(
+                        $url->resetPasswordLeafClassName,
+                        $url->confirmResetPasswordLeafClassName
+                    ),
+                    $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url) {
+                        $className = $url->logoutLeafClassName;
+                        return new $className($url->loginProviderClassName);
+                    }),
+                ]),
+                $url->urlToProtect => $protected =
+                    new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
             ]);
 
-        $logout = new ClassMappedUrlHandler(__NAMESPACE__ . '\Leaves\Logout');
+            // Make sure that the login url handlers are given greater precedence than those of the application.
+            $login->setPriority(10);
+            $login->setName('login');
 
-        $logout->setName("logout");
+            $logout->setPriority(10);
+            $logout->setName('logout');
 
-        $this->addUrlHandlers(
-            [
-                "/logout/" => $logout
-            ]);
+            $reset->setPriority(10);
+            $reset->setName('reset');
 
-        // Make sure that the login url handlers are given greater precedence than those of the application.
-        $login->setPriority(10);
-        //$reset->setPriority(10);
-        $validateLoginUrlHandler->setPriority(10);
+            $protected->setPriority(10);
+        }
     }
 
     /**

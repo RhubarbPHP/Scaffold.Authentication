@@ -22,11 +22,6 @@ use Rhubarb\Leaf\Views\View;
 
 class LogoutView extends View
 {
-    /**
-    * @var LogoutModel
-    */
-    protected $model;
-
     protected function printViewContent()
     {
     }
