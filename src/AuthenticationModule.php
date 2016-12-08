@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
+use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
@@ -40,6 +41,10 @@ class AuthenticationModule extends Module
     public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/')
     {
         parent::__construct();
+
+        if ($loginProviderClassName != null) {
+            LoginProvider::setProviderClassName($loginProviderClassName);
+          }
 
         if ($loginProviderClassName !== null) {
             $this->registerProtectedUrl(new ProtectedUrl(

@@ -1,6 +1,8 @@
 # Change Log
 
-### 1.1.x
+### 1.1.1
+
+* Fix:		Fixed backwards issue with default provider not being registered
 
 ### 1.1.0
 
