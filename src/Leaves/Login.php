@@ -69,11 +69,7 @@ class Login extends Leaf
     protected function onSuccess()
     {
         if (isset($this->model->redirectUrl)) {
-            $url = base64_decode($this->model->redirectUrl);
-
-            if ($url) {
-                throw new ForceResponseException(new RedirectResponse($url));
-            }
+            throw new ForceResponseException(new RedirectResponse($this->model->redirectUrl));
         }
 
         throw new ForceResponseException(new RedirectResponse($this->getDefaultSuccessUrl()));

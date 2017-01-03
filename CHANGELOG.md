@@ -1,6 +1,8 @@
 # Change Log
 
-### 1.1.x
+### 1.1.2
+
+* Fixed:        Attempt to base64 decode an unencoded redirect URL
 
 ### 1.1.1
 
