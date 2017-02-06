@@ -35,7 +35,7 @@ class ResetPasswordView extends View
         parent::createSubLeaves();
 
         $this->registerSubLeaf(
-            new TextBox("username", 30),
+            new TextBox("username"),
             new Button("ResetPassword", "Continue", function () {
                 $this->model->resetPasswordEvent->raise();
             })
