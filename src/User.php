@@ -44,7 +44,7 @@ class User extends Model
 
         $schema->addColumn(
             new AutoIncrementColumn("UserID"),
-            new StringColumn("Username", 30, null),
+            new StringColumn("Username", 150, null),
             new StringColumn("Password", 200),
             new StringColumn("Forename", 80),
             new StringColumn("Surname", 80),
