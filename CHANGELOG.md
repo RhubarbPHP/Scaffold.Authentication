@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.1.3
+
+* Fixed:	Removed unnecessary second argument to TextBox
+
 ### 1.1.2
 
 * Fixed:        Attempt to base64 decode an unencoded redirect URL
