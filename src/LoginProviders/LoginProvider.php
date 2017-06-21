@@ -82,15 +82,15 @@ class LoginProvider extends ModelLoginProvider
         if (!$this->isLoggedIn()) {
             $request = Request::current();
 
-            if ($request->cookie('lun') != "") {
+            if (isset($request->cookieData['lun'])) {
                 $username = $request->cookie('lun');
                 try {
                     $user = User::fromIdentifierColumnValue($username);
 
-                    $token = $request->cookie('ltk');
+                    $token = $request->cookieData['ltk'];
 
                     if ($user->validateToken($token)) {
-                        $this->LoggedIn = true;
+                        $this->loggedIn = true;
                         $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
                         $this->storeSession();
                     }
