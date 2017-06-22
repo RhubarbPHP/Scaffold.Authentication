@@ -82,17 +82,15 @@ class LoginProvider extends ModelLoginProvider
         if (!$this->isLoggedIn()) {
             $request = Request::current();
 
-            if (isset($request->cookieData['lun'])) {
+            if ($request->cookie('lun') != "") {
                 $username = $request->cookie('lun');
                 try {
                     $user = User::fromIdentifierColumnValue($username);
 
-                    $token = $request->cookieData['ltk'];
+                    $token = $request->cookie('ltk');
 
                     if ($user->validateToken($token)) {
-                        $this->loggedIn = true;
-                        $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
-                        $this->storeSession();
+                        $this->forceLogin($user);
                     }
                 } catch (RecordNotFoundException $ex) {
                 }
