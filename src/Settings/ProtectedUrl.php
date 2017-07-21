@@ -18,7 +18,7 @@ class ProtectedUrl
     public $logoutChildUrl = 'logout';
     public $logoutLeafClassName = Logout::class;
 
-    public $resetChildUrl = 'reset';
+    public $resetChildUrl = 'reset/';
     public $resetPasswordLeafClassName = ResetPassword::class;
     public $confirmResetPasswordLeafClassName = ConfirmResetPassword::class;
 
