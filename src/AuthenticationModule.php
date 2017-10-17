@@ -88,7 +88,7 @@ class AuthenticationModule extends Module
                         $className = $url->logoutLeafClassName;
                         return new $className($url->loginProviderClassName);
                     }),
-                    $url->activateChildUrl => $activate = new ClassMappedUrlHandler($url->activatePasswordLeafClassName),
+                    $url->activateChildUrl => $activate = new LeafCollectionUrlHandler($url->activatePasswordLeafClassName,$url->activatePasswordLeafClassName),
                 ]),
                 $url->urlToProtect => $protected =
                     new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
