@@ -44,24 +44,13 @@ Please note you must do this within 24 hours or you will need to request a new i
 
 If you did not request this password reset invitation please disregard this email.
 
-" . $settings->absoluteWebsiteUrl. "/login/reset/".$this->user->PasswordResetHash."/";
+" . $settings->absoluteWebsiteUrl . "/login/reset/" . $this->user->PasswordResetHash . "/";
 
     }
 
     public function getHtml()
     {
-        $settings = WebsiteSettings::singleton();
-
-        return "
-<h1>Password Reset Invitation</h1>
-<p>You recently requested an invitation to reset your password. Below you will find a
-link which when clicked will return you to the site and let you enter a new password.</p>
-
-<p>Please note you must do this within 24 hours or you will need to request a new invitation.</p>
-
-<p>If you did not request this password reset invitation please disregard this email.</p>
-
-<p><a href=\"" . $settings->absoluteWebsiteUrl. "/login/reset/".$this->user->PasswordResetHash."/\">Click to reset password</a></p>";
+        return $this->getHtmlHeading() . $this->getHtmlBody();
     }
 
     /**
@@ -84,6 +73,26 @@ link which when clicked will return you to the site and let you enter a new pass
     public static function fromArray($array)
     {
         $user = new User($array["UserID"]);
-        return Container::instance(ResetPasswordInvitationEmail::class,$user);
+        return Container::instance(ResetPasswordInvitationEmail::class, $user);
+    }
+
+    public function getHtmlHeading()
+    {
+        return "<h1>Password Reset Invitation</h1>";
+    }
+
+    public function getHtmlBody()
+    {
+        $settings = WebsiteSettings::singleton();
+        return <<<HtmlBody
+<p>You recently requested an invitation to reset your password. Below you will find a
+link which when clicked will return you to the site and let you enter a new password.</p>
+
+<p>Please note you must do this within 24 hours or you will need to request a new invitation.</p>
+
+<p>If you did not request this password reset invitation please disregard this email.</p>
+
+<p><a href="{$settings->absoluteWebsiteUrl}/login/reset/{$this->user->PasswordResetHash}/">Click to reset your password</a></p>";
+HtmlBody;
     }
 }

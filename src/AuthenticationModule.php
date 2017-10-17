@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
+use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
 use Rhubarb\Scaffolds\Authentication\UrlHandlers\CallableUrlHandler;
@@ -44,7 +45,7 @@ class AuthenticationModule extends Module
 
         if ($loginProviderClassName != null) {
             LoginProvider::setProviderClassName($loginProviderClassName);
-          }
+        }
 
         if ($loginProviderClassName !== null) {
             $this->registerProtectedUrl(new ProtectedUrl(
@@ -87,6 +88,7 @@ class AuthenticationModule extends Module
                         $className = $url->logoutLeafClassName;
                         return new $className($url->loginProviderClassName);
                     }),
+                    $url->activateChildUrl => $activate = new ClassMappedUrlHandler($url->activatePasswordLeafClassName),
                 ]),
                 $url->urlToProtect => $protected =
                     new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
@@ -101,6 +103,9 @@ class AuthenticationModule extends Module
 
             $reset->setPriority(10);
             $reset->setName('reset');
+
+            $activate->setPriority(10);
+            $activate->setName('activate');
 
             $protected->setPriority(10);
         }

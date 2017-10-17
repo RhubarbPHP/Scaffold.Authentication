@@ -58,14 +58,24 @@ class ConfirmResetPasswordView extends View
             return;
         }
 
-        $this->layoutItemsWithContainer("Resetting your password",
-            "<p class='c-form__help'>Complete your password reset by entering a new password.</p>",
+        $this->layoutItemsWithContainer($this->getTitle(),
+            "<p class='c-form__help'>{$this->getTitleParagraph()}</p>",
             [
                 "Enter new password" => "newPassword",
                 "Enter again to confirm" => "confirmNewPassword",
                 "" => "ResetPassword"
             ]
         );
+    }
+
+    protected function getTitle()
+    {
+        return "Resetting your password";
+    }
+
+    protected function getTitleParagraph()
+    {
+        return "Complete your password reset by entering a new password.";
     }
 
     /**
