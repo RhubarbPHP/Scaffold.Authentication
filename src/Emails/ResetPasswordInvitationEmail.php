@@ -60,6 +60,7 @@ If you did not request this password reset invitation please disregard this emai
     {
         return "Your password reset invitation.";
     }
+
     /**
      * Expresses the sendable as an array allowing it to be serialised, stored and recovered later.
      *

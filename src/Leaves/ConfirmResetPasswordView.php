@@ -101,7 +101,6 @@ PasswordsDontMatch;
 <p class="c-alert c-alert--error">Password and Confirm Password fields cannot be empty</p>
 PasswordEmpty;
 
-
         $messages["UserNotRecognised"] = <<<PasswordsDontMatch
 <p class="c-alert c-alert--error">Sorry, the user account you are attempting to reset has not been recognised.
 Please click the 'forgot my password' link again.</p>

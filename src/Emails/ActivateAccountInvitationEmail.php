@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Rhubarb\Scaffolds\Authentication\Emails;
-
 
 use Rhubarb\Crown\Settings\WebsiteSettings;
 

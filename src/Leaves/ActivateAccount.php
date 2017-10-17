@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
-
 
 class ActivateAccount extends ConfirmResetPassword
 {
