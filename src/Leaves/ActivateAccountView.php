@@ -67,6 +67,11 @@ PasswordReset;
 <p class="c-alert c-alert--error">Sorry, your activation link has expired or is not recognised.
 Please ask for a new invitation</p>
 HashInvalid;
+        $messages["UserNotRecognised"] = <<<UserNotRecognised
+<p class="c-alert c-alert--error">Sorry, we had trouble activating your account.
+Please request another invitation</p>
+UserNotRecognised;
+
 
         return $messages;
     }
