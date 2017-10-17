@@ -50,7 +50,7 @@ If you did not request this password reset invitation please disregard this emai
 
     public function getHtml()
     {
-        return $this->getHtmlHeading() . $this->getHtmlBody();
+        return $this->getHtmlHeading() . " " . $this->getHtmlBody();
     }
 
     /**

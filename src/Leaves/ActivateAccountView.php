@@ -55,7 +55,7 @@ class ActivateAccountView extends ConfirmResetPasswordView
 
     protected function getMessages()
     {
-        $messages = parent::getMessages();
+        $messages = [];
 
         $messages['PasswordReset'] = <<<PasswordReset
 <p class="c-alert">Thanks, your account has now been activated. If you still have difficulties logging in you
@@ -63,15 +63,24 @@ should contact us for assistance. We will never ask you for your password, but w
 be able to reset it for you.</p>
 PasswordReset;
 
+        $messages["PasswordsDontMatch"] = <<<PasswordsDontMatch
+<p class="c-alert c-alert--error">Sorry, the password entries you made do not match.
+Please enter your password again</p>
+PasswordsDontMatch;
+
+        $messages["PasswordEmpty"] = <<<PasswordEmpty
+<p class="c-alert c-alert--error">Password and Confirm Password fields cannot be empty</p>
+PasswordEmpty;
+
+        $messages["UserNotRecognised"] = <<<PasswordsDontMatch
+<p class="c-alert c-alert--error">Sorry, the user account you are attempting to reset has not been recognised.
+Please ask for a new invitation</p>
+PasswordsDontMatch;
+
         $messages['HashInvalid'] = <<<HashInvalid
 <p class="c-alert c-alert--error">Sorry, your activation link has expired or is not recognised.
 Please ask for a new invitation</p>
 HashInvalid;
-        $messages["UserNotRecognised"] = <<<UserNotRecognised
-<p class="c-alert c-alert--error">Sorry, we had trouble activating your account.
-Please request another invitation</p>
-UserNotRecognised;
-
 
         return $messages;
     }
