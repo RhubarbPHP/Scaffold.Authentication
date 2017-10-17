@@ -47,7 +47,7 @@ Text;
 
 <p>Please note you must do this within 24 hours or you will need to request a new invitation.</p>
 
-<p><a href="{$settings->absoluteWebsiteUrl}/activate/account/{$this->user->PasswordResetHash}/">Click to activate your account</a></p>";
+<p><a href="{$settings->absoluteWebsiteUrl}/activate/account/{$this->user->PasswordResetHash}/">Click to activate your account</a></p>
 HtmlBody;
     }
 }

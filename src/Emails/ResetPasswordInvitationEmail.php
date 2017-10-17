@@ -92,7 +92,7 @@ link which when clicked will return you to the site and let you enter a new pass
 
 <p>If you did not request this password reset invitation please disregard this email.</p>
 
-<p><a href="{$settings->absoluteWebsiteUrl}/login/reset/{$this->user->PasswordResetHash}/">Click to reset your password</a></p>";
+<p><a href="{$settings->absoluteWebsiteUrl}/login/reset/{$this->user->PasswordResetHash}/">Click to reset your password</a></p>
 HtmlBody;
     }
 }
