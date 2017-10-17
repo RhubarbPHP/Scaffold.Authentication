@@ -55,9 +55,8 @@ class ActivateAccountView extends ConfirmResetPasswordView
 
     protected function getMessages()
     {
-        parent::getMessages();
+        $messages = parent::getMessages();
 
-        $messages = [];
         $messages['PasswordReset'] = <<<PasswordReset
 <p class="c-alert">Thanks, your account has now been activated. If you still have difficulties logging in you
 should contact us for assistance. We will never ask you for your password, but we should
