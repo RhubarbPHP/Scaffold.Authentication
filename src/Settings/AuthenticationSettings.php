@@ -27,4 +27,13 @@ class AuthenticationSettings extends Settings
      * @var string
      */
     public $identityColumnName = "Username";
+
+    /**
+     * Used to detect the number of days that should be between a Password being changed
+     * This will be used to ensure a Password has to be changed when the number of days between LastPasswordChangeDate
+     * and CurrentDate is greater than the passwordExpirationInterval
+     *
+     * @var int
+     */
+    public $passwordExpirationInterval = 0;
 }
