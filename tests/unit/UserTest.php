@@ -3,12 +3,20 @@
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
 use Rhubarb\Crown\Encryption\HashProvider;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Encryption\Sha512HashProvider;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
-use Rhubarb\Scaffolds\AuthenticationWithRoles\User;
+use Rhubarb\Scaffolds\Authentication\User;
 
 class UserTest extends RhubarbTestCase
 {
+    protected function _before()
+    {
+        parent::_before();
+
+        HashProvider::setProviderClassName(Sha512HashProvider::class);
+    }
+
     public function testPasswordResetHash()
     {
         $user = new User();
@@ -47,7 +55,7 @@ class UserTest extends RhubarbTestCase
         $user->Username = "joebloggs";
         $user->setNewPassword("abc123");
 
-        $hashProvider = HashProvider::getHashProvider();
+        $hashProvider = HashProvider::getProvider();
         $hashProvider->compareHash("abc123", $user->Password);
     }
 
