@@ -3,13 +3,16 @@
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
 use Rhubarb\Crown\Application;
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\Sha512HashProvider;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\DatabaseSchema;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
@@ -71,4 +74,28 @@ class LoginProviderTest extends RhubarbTestCase
 
         $this->assertEquals($user->UniqueIdentifier, $pUser->UniqueIdentifier);
     }
+
+//    public function testPasswordExpired()
+//    {
+//        AuthenticationSettings::singleton()->passwordExpirationInterval = 3;
+//
+//        $user = new User();
+//        $user->setNewPassword("abc123");
+//        $user->Username = "test";
+//        $user->Forename = "test";
+//        $user->Enabled = 1;
+//        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
+//        $user->save();
+//
+//        try {
+//            $loginProvider = LoginProvider::singleton();
+//            $loginProvider->login("test", "abc123");
+//
+//            $this->fail("Expected Password to be seen as expired");
+//        } catch (LoginFailedException $exception) {
+//            $this->assertEquals("Password has expired.", $exception->getPrivateMessage());
+//        }
+//
+//
+//    }
 }
