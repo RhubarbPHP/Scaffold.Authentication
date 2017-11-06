@@ -251,7 +251,7 @@ class User extends Model implements CheckExpiredModelInterface
         $lastPasswordChangeDate = $this->LastPasswordChangeDate;
         $currentDate = new RhubarbDateTime('now');
 
-        if ($passwordExpirationDaysInterval > 0 && $lastPasswordChangeDate) {
+        if ($passwordExpirationDaysInterval && $lastPasswordChangeDate) {
             $timeDifference = $currentDate->diff($lastPasswordChangeDate);
             if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
                 return true;
