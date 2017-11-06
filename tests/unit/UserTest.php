@@ -3,9 +3,9 @@
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
 use Rhubarb\Crown\Encryption\HashProvider;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
-use Rhubarb\Scaffolds\AuthenticationWithRoles\User;
+use Rhubarb\Scaffolds\Authentication\User;
 
 class UserTest extends RhubarbTestCase
 {

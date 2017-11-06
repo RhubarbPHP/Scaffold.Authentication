@@ -90,8 +90,8 @@ class LoginProvider extends ModelLoginProvider
                     $token = $request->cookie('ltk');
 
                     if ($user->validateToken($token)) {
-                        $this->LoggedIn = true;
-                        $this->LoggedInUserIdentifier = $user->UniqueIdentifier;
+                        $this->loggedIn = true;
+                        $this->loggedInUserIdentifier = $user->UniqueIdentifier;
                         $this->storeSession();
                     }
                 } catch (RecordNotFoundException $ex) {

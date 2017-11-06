@@ -2,13 +2,23 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
-use Rhubarb\Crown\Settings;
-use Rhubarb\Crown\Tests\RhubarbTestCase;
+use Rhubarb\Crown\Encryption\HashProvider;
+use Rhubarb\Crown\Encryption\Sha512HashProvider;
+use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\User;
 
 class LoginProviderTest extends RhubarbTestCase
 {
+    protected function _before()
+    {
+        parent::_before();
+
+        HashProvider::setProviderClassName(Sha512HashProvider::class);
+        \Rhubarb\Crown\LoginProviders\LoginProvider::setProviderClassName(LoginProvider::class);
+    }
+
     public function testAutoLogin()
     {
         $user = new User();
@@ -20,21 +30,16 @@ class LoginProviderTest extends RhubarbTestCase
 
         $token = $user->createToken();
 
-        Settings::deleteSettingNamespace("LoginProvider");
-
-        $request = Context::currentRequest();
+        /** @var \Rhubarb\Crown\Request\WebRequest $request */
+        $request = Request::current();
         $request->cookie('lun', "test");
         $request->cookie('ltk', "anyoldvalue");
 
-        $loginProvider = new LoginProvider();
+        $loginProvider = LoginProvider::singleton();
 
         $this->assertFalse($loginProvider->isLoggedIn());
 
-        Settings::deleteSettingNamespace("LoginProvider");
-
         $request->cookie('ltk', $token);
-
-        $loginProvider = new LoginProvider();
 
         $this->assertTrue($loginProvider->isLoggedIn());
     }
@@ -48,7 +53,7 @@ class LoginProviderTest extends RhubarbTestCase
         $user->Enabled = 1;
         $user->save();
 
-        $loginProvider = new LoginProvider();
+        $loginProvider = LoginProvider::singleton();
         $loginProvider->login("test", "abc123");
 
         $pUser = LoginProvider::getLoggedInUser();
