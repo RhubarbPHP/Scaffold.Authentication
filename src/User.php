@@ -29,6 +29,7 @@ use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Filters\Not;
+use Rhubarb\Stem\Interfaces\CheckExpiredModelInterface;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
@@ -36,7 +37,7 @@ use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
 use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
-class User extends Model
+class User extends Model implements CheckExpiredModelInterface
 {
     /**
      * Returns the schema for this data object.
@@ -240,5 +241,23 @@ class User extends Model
 
         $hashProvider = HashProvider::getProvider();
         return $hashProvider->compareHash($this->getSavedPasswordTokenData(), $token);
+    }
+
+    public function hasModelExpired()
+    {
+        $passwordExpirationDaysInterval = AuthenticationSettings::singleton()->passwordExpirationIntervalInDays;
+
+        /** @var $lastPasswordChangeDate \Rhubarb\Crown\DateTime\RhubarbDateTime */
+        $lastPasswordChangeDate = $this->LastPasswordChangeDate;
+        $currentDate = new RhubarbDateTime('now');
+
+        if ($passwordExpirationDaysInterval > 0 && $lastPasswordChangeDate) {
+            $timeDifference = $currentDate->diff($lastPasswordChangeDate);
+            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

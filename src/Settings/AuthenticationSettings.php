@@ -35,5 +35,5 @@ class AuthenticationSettings extends Settings
      *
      * @var int
      */
-    public $passwordExpirationInterval = 0;
+    public $passwordExpirationIntervalInDays = 0;
 }

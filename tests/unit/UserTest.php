@@ -2,10 +2,12 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\Sha512HashProvider;
 use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 
 class UserTest extends RhubarbTestCase
@@ -134,5 +136,40 @@ class UserTest extends RhubarbTestCase
         $user->setNewPassword("abc123");
         $user->save();
         $this->assertEquals("", $user->PasswordResetHash);
+    }
+
+    public function testHasModelExpired()
+    {
+        AuthenticationSettings::singleton()->passwordExpirationIntervalInDays = 3;
+
+        $user = new User();
+        $user->setNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
+        $user->save();
+
+        $this->assertTrue($user->hasModelExpired());
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-3 days');
+        $user->save();
+
+        $this->assertFalse($user->hasModelExpired());
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-2.5 days');
+        $user->save();
+
+        $this->assertTrue($user->hasModelExpired());
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-2 days');
+        $user->save();
+
+        $this->assertFalse($user->hasModelExpired());
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-1 day');
+        $user->save();
+
+        $this->assertFalse($user->hasModelExpired());
     }
 }

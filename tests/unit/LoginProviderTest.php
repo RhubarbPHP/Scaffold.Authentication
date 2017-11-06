@@ -6,6 +6,7 @@ use Rhubarb\Crown\Application;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\Sha512HashProvider;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
@@ -75,27 +76,45 @@ class LoginProviderTest extends RhubarbTestCase
         $this->assertEquals($user->UniqueIdentifier, $pUser->UniqueIdentifier);
     }
 
-//    public function testPasswordExpired()
-//    {
-//        AuthenticationSettings::singleton()->passwordExpirationInterval = 3;
-//
-//        $user = new User();
-//        $user->setNewPassword("abc123");
-//        $user->Username = "test";
-//        $user->Forename = "test";
-//        $user->Enabled = 1;
-//        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
-//        $user->save();
-//
-//        try {
-//            $loginProvider = LoginProvider::singleton();
-//            $loginProvider->login("test", "abc123");
-//
-//            $this->fail("Expected Password to be seen as expired");
-//        } catch (LoginFailedException $exception) {
-//            $this->assertEquals("Password has expired.", $exception->getPrivateMessage());
-//        }
-//
-//
-//    }
+    public function testPasswordExpired()
+    {
+        AuthenticationSettings::singleton()->passwordExpirationIntervalInDays = 3;
+
+        $user = new User();
+        $user->setNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
+        $user->save();
+
+        try {
+            $loginProvider = LoginProvider::singleton();
+            $loginProvider->login("test", "abc123");
+
+            $this->fail("Expected Password to be seen as expired");
+        } catch (LoginExpiredException $exception) {
+        }
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-2 days');
+        $user->save();
+
+        try {
+            $loginProvider = LoginProvider::singleton();
+            $loginProvider->login("test", "abc123");
+
+        } catch (LoginExpiredException $exception) {
+            $this->fail("Login should not be detected as expired");
+        }
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-1 day');
+        $user->save();
+
+        try {
+            $loginProvider = LoginProvider::singleton();
+            $loginProvider->login("test", "abc123");
+        } catch (LoginExpiredException $exception) {
+            $this->fail("Login should not be detected as expired");
+        }
+    }
 }
