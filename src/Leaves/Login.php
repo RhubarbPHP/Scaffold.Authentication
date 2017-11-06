@@ -20,6 +20,7 @@ namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledException;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\Request\Request;
@@ -144,6 +145,8 @@ class Login extends Leaf
                 $this->model->failed = true;
             } catch (LoginFailedException $er) {
                 $this->model->failed = true;
+            } catch (LoginExpiredException $er) {
+                $this->model->expired = true;
             }
         });
     }

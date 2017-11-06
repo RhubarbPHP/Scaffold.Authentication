@@ -53,6 +53,10 @@ class LoginView extends View
             print '<div class="c-alert c-alert--error">Sorry, this username and password combination could not be found, please check and try again.</div>';
         }
 
+        if ($this->model->expired) {
+            print '<div class="c-alert c-alert--error">Sorry, this password has now expired, please update your password before logging in.</div>';
+        }
+
         ?>
         <fieldset class="c-form c-form--inline">
             <div class="c-form__group">
