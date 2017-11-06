@@ -17,6 +17,6 @@
     "rhubarbphp/module-leaf-common-controls": "*"
   },
   "require-dev": {
-    "codeception/codeception": "^2.3"
+    "phpunit/phpunit": "^6.0.0"
   }
 }

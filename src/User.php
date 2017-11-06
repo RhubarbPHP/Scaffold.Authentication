@@ -57,7 +57,8 @@ class User extends Model
             new DateTimeColumn("TokenExpiry"),
             new BooleanColumn("Enabled", false),
             new StringColumn("PasswordResetHash", 200),
-            new DateTimeColumn("PasswordResetDate")
+            new DateTimeColumn("PasswordResetDate"),
+            new DateTimeColumn("LastPasswordChangeDate")
         );
 
         $schema->labelColumnName = "FullName";
