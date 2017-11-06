@@ -57,6 +57,8 @@ class UserTest extends RhubarbTestCase
 
         $hashProvider = HashProvider::getProvider();
         $hashProvider->compareHash("abc123", $user->Password);
+
+        $this->assertNotNull($user->LastPasswordChangeDate);
     }
 
     public function testCreateToken()
