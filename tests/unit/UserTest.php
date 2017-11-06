@@ -53,10 +53,14 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "joebloggs";
+
+        $this->assertFalse($user->LastPasswordChangeDate->isValidDateTime());
         $user->setNewPassword("abc123");
 
         $hashProvider = HashProvider::getProvider();
         $hashProvider->compareHash("abc123", $user->Password);
+
+        $this->assertTrue($user->LastPasswordChangeDate->isValidDateTime());
     }
 
     public function testCreateToken()

@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
@@ -57,7 +58,8 @@ class User extends Model
             new DateTimeColumn("TokenExpiry"),
             new BooleanColumn("Enabled", false),
             new StringColumn("PasswordResetHash", 200),
-            new DateTimeColumn("PasswordResetDate")
+            new DateTimeColumn("PasswordResetDate"),
+            new DateTimeColumn("LastPasswordChangeDate")
         );
 
         $schema->labelColumnName = "FullName";
@@ -99,6 +101,8 @@ class User extends Model
 
         $this->Password = $provider->createHash($password);
         $this->PasswordResetHash = "";
+
+        $this->LastPasswordChangeDate = new RhubarbDateTime('now');
     }
 
     /**
