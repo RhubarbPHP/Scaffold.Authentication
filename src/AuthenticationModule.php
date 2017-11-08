@@ -22,6 +22,7 @@ use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
 use Rhubarb\Scaffolds\Authentication\UrlHandlers\CallableUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
@@ -36,9 +37,10 @@ class AuthenticationModule extends Module
      * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
      *                                  the entire URL tree.
      * @param string $loginUrl The URL to redirect the user to for logging in
+     * @param bool $enablePasswordChangeLog Store recent password changes
      * @internal param string $identityColumnName The name of the column in the user table storing the login identity.
      */
-    public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/')
+    public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/', $enablePasswordChangeLog = false)
     {
         parent::__construct();
 
@@ -53,6 +55,8 @@ class AuthenticationModule extends Module
                 $loginUrl
             ));
         }
+
+        AuthenticationSettings::singleton()->enablePasswordChangeLog = $enablePasswordChangeLog;
     }
 
     public function registerProtectedUrl(ProtectedUrl $urlToProtect)

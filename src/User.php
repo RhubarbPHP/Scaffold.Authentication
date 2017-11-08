@@ -24,7 +24,6 @@ use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
-use Rhubarb\Stem\Exceptions\ModelException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
@@ -259,5 +258,26 @@ class User extends Model implements CheckExpiredModelInterface
         }
 
         return false;
+    }
+
+    protected function attachPropertyChangedNotificationHandlers()
+    {
+        parent::attachPropertyChangedNotificationHandlers();
+
+        if (AuthenticationSettings::singleton()->enablePasswordChangeLog) {
+            $this->addPropertyChangedNotificationHandler('Password', function ($newValue, $propertyName, $oldValue) {
+                $this->performAfterSave(
+                    function () use ($propertyName, $oldValue) {
+                        if ($propertyName == "Password" && !empty($oldValue) && $this->Password != $oldValue) {
+                            UserPastPassword::removePreviousPasswords($this->UniqueIdentifier);
+                            $userPastPassword = new UserPastPassword();
+                            $userPastPassword->UserID = $this->UniqueIdentifier;
+                            $userPastPassword->Password = $oldValue;
+                            $userPastPassword->save();
+                        }
+                    }
+                );
+            });
+        }
     }
 }

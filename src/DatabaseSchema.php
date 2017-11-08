@@ -27,5 +27,6 @@ class DatabaseSchema extends SolutionSchema
         parent::__construct($version);
 
         $this->addModel('User', User::class);
+        $this->addModel('UserPastPassword', UserPastPassword::class);
     }
 }
