@@ -9,6 +9,7 @@ use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 
 class UserTest extends RhubarbTestCase
 {
@@ -171,5 +172,29 @@ class UserTest extends RhubarbTestCase
         $user->save();
 
         $this->assertFalse($user->hasModelExpired());
+    }
+
+    public function testPreviouslyUsedPassword()
+    {
+        AuthenticationSettings::singleton()->storeUserPasswordChanges = true;
+        AuthenticationSettings::singleton()->totalPreviousPasswordsToStore = 10;
+
+        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = true;
+        AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo = 10;
+
+        $user = new User();
+        $user->setNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
+        $user->save();
+
+        try {
+            $user->setNewPassword("abc123");
+            $user->save();
+        } catch (ModelConsistencyValidationException $exception) {
+            $this->assertEquals("The password you have entered has already been used. Please enter a new password.", $exception->getErrors()["Password"]);
+        }
     }
 }

@@ -56,7 +56,7 @@ class AuthenticationModule extends Module
             ));
         }
 
-        AuthenticationSettings::singleton()->enablePasswordChangeLog = $enablePasswordChangeLog;
+        AuthenticationSettings::singleton()->storeUserPasswordChanges = $enablePasswordChangeLog;
     }
 
     public function registerProtectedUrl(ProtectedUrl $urlToProtect)

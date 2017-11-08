@@ -40,18 +40,30 @@ class AuthenticationSettings extends Settings
 
     /****** PASSWORD LOGGING SETTINGS ******/
 
-    public $enablePasswordChangeLog = false;
+    /**
+     * The following is used to control whether a users previous password should be retained
+     * @var bool
+     */
+    public $storeUserPasswordChanges = false;
 
     /**
      * Used to validate how many previous passwords should be stored when a user updates their Password
      * @var int
      */
-    public $totalPreviousPasswordsToStore = 10;
+    public $totalPreviousPasswordsToStore = 0;
+
+
+    /**
+     * The following flag is used to check if when a user changes their password we should check that they have not simply
+     * reused a previously entered password
+     * @var bool
+     */
+    public $compareNewUserPasswordWithPreviousEntries = false;
 
     /**
      * Used to check how many previous passwords should be compared with when a user changes their Password
      * This is used to ensure a User cannot just reuse their previous password each time
      * @var int
      */
-    public $numberOfPastPasswordsToCompareTo = 10;
+    public $numberOfPastPasswordsToCompareTo = 0;
 }

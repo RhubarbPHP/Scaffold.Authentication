@@ -40,6 +40,13 @@ use Rhubarb\Stem\Schema\ModelSchema;
 class User extends Model implements CheckExpiredModelInterface
 {
     /**
+     * This flag is used to check whether a password has been changed and needs to be validated
+     * inside getConsistencyValidationErrors()
+     * @var bool
+     */
+    private $passwordChanged = false;
+
+    /**
      * Returns the schema for this data object.
      *
      * @return \Rhubarb\Stem\Schema\ModelSchema
@@ -104,6 +111,8 @@ class User extends Model implements CheckExpiredModelInterface
         $this->PasswordResetHash = "";
 
         $this->LastPasswordChangeDate = new RhubarbDateTime('now');
+
+        $this->passwordChanged = true;
     }
 
     /**
@@ -218,6 +227,27 @@ class User extends Model implements CheckExpiredModelInterface
             }
         }
 
+        //  Validate new password has not been previously used
+        if ($this->passwordChanged && AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries) {
+
+            $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo;
+            if ($numberOfPastPasswordsToCompareTo) {
+
+                $hashProvider = HashProvider::getProvider();
+
+                $userPastPasswords = UserPastPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
+                $userPastPasswords->addSort("DateCreated", false);
+                $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
+
+                foreach ($userPastPasswords as $userPastPassword) {
+                    if ($hashProvider->compareHash($this->Password, $userPastPassword->Password)) {
+                        $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
+                        break;
+                    }
+                }
+            }
+        }
+
         return $errors;
     }
 
@@ -265,7 +295,7 @@ class User extends Model implements CheckExpiredModelInterface
     {
         parent::attachPropertyChangedNotificationHandlers();
 
-        if (AuthenticationSettings::singleton()->enablePasswordChangeLog) {
+        if (AuthenticationSettings::singleton()->storeUserPasswordChanges) {
             $this->addPropertyChangedNotificationHandler('Password', function ($newValue, $propertyName, $oldValue) {
                 $this->performAfterSave(
                     function () use ($propertyName, $oldValue) {
