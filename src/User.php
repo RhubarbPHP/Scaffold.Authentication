@@ -24,6 +24,7 @@ use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
+use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;

@@ -21,7 +21,7 @@ class UserPastPassword extends Model
             new AutoIncrementColumn('UserPastPasswordID'),
             new ForeignKeyColumn('UserID'),
             new StringColumn("Password", 200),
-            new DateTimeColumn('CreatedDate')
+            new DateTimeColumn('DateCreated')
         );
 
         return $schema;
@@ -32,14 +32,14 @@ class UserPastPassword extends Model
         parent::beforeSave();
 
         if ($this->isNewRecord()) {
-            $this->CreatedDate = new RhubarbDateTime('now');
+            $this->DateCreated = new RhubarbDateTime('now');
         }
     }
 
     public static function removePreviousPasswords($userID)
     {
         $previousPasswords = self::find(new Equals("UserID", $userID));
-        $previousPasswords->addSort("CreatedDate", false);
+        $previousPasswords->addSort("DateCreated", false);
 
         $totalPreviousPasswordsToStore = AuthenticationSettings::singleton()->totalPreviousPasswordsToStore;
         if ($previousPasswords->count() >= $totalPreviousPasswordsToStore) {

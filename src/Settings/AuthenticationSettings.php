@@ -38,9 +38,7 @@ class AuthenticationSettings extends Settings
     public $passwordExpirationIntervalInDays = 0;
 
 
-    /******************************************************************************************************************
-     * Password Logging Settings
-     */
+    /****** PASSWORD LOGGING SETTINGS ******/
 
     public $enablePasswordChangeLog = false;
 
@@ -55,5 +53,5 @@ class AuthenticationSettings extends Settings
      * This is used to ensure a User cannot just reuse their previous password each time
      * @var int
      */
-    public $numberOfPastPasswordToCompareTo = 10;
+    public $numberOfPastPasswordsToCompareTo = 10;
 }

@@ -28,5 +28,6 @@ class DatabaseSchema extends SolutionSchema
 
         $this->addModel('User', User::class);
         $this->addModel('UserPastPassword', UserPastPassword::class);
+        $this->addModel('UserLoginAttempt', UserLoginAttempt::class);
     }
 }
