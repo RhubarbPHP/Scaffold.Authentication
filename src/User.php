@@ -28,8 +28,9 @@ use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
+use Rhubarb\Stem\Filters\GreaterThan;
 use Rhubarb\Stem\Filters\Not;
-use Rhubarb\Stem\Interfaces\CheckExpiredModelInterface;
+use Rhubarb\Stem\Interfaces\ValidateLoginModelInterface;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
@@ -37,7 +38,7 @@ use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
 use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
-class User extends Model implements CheckExpiredModelInterface
+class User extends Model implements ValidateLoginModelInterface
 {
     /**
      * This flag is used to check whether a password has been changed and needs to be validated
@@ -273,24 +274,6 @@ class User extends Model implements CheckExpiredModelInterface
         return $hashProvider->compareHash($this->getSavedPasswordTokenData(), $token);
     }
 
-    public function hasModelExpired()
-    {
-        $passwordExpirationDaysInterval = AuthenticationSettings::singleton()->passwordExpirationIntervalInDays;
-
-        /** @var $lastPasswordChangeDate \Rhubarb\Crown\DateTime\RhubarbDateTime */
-        $lastPasswordChangeDate = $this->LastPasswordChangeDate;
-        $currentDate = new RhubarbDateTime('now');
-
-        if ($passwordExpirationDaysInterval && $lastPasswordChangeDate && $lastPasswordChangeDate->isValidDateTime()) {
-            $timeDifference = $currentDate->diff($lastPasswordChangeDate);
-            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected function attachPropertyChangedNotificationHandlers()
     {
         parent::attachPropertyChangedNotificationHandlers();
@@ -310,5 +293,60 @@ class User extends Model implements CheckExpiredModelInterface
                 );
             });
         }
+    }
+
+    public function isModelExpired()
+    {
+        $passwordExpirationDaysInterval = AuthenticationSettings::singleton()->passwordExpirationIntervalInDays;
+
+        /** @var $lastPasswordChangeDate \Rhubarb\Crown\DateTime\RhubarbDateTime */
+        $lastPasswordChangeDate = $this->LastPasswordChangeDate;
+        $currentDate = new RhubarbDateTime('now');
+
+        if ($passwordExpirationDaysInterval && $lastPasswordChangeDate && $lastPasswordChangeDate->isValidDateTime()) {
+            $timeDifference = $currentDate->diff($lastPasswordChangeDate);
+            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isModelDisabled()
+    {
+        if (!AuthenticationSettings::singleton()->disableAccountAfterFailedLoginAttempts) {
+            return false;
+        }
+
+        $andGroupFilter = new AndGroup();
+        $andGroupFilter->addFilters(new Equals("EnteredUsername", $this->Username));
+        $andGroupFilter->addFilters(new Equals("Successful", false));
+
+        // Retrieve last successful login attempt
+        $lastSuccesfulLoginAttempt = UserLoginAttempt::getLastSuccessfulLoginAttempt($this->Username);
+        if ($lastSuccesfulLoginAttempt) {
+            $andGroupFilter->addFilters(new GreaterThan("UserLoginAttemptID", $lastSuccesfulLoginAttempt->UserLoginAttemptID));
+        }
+
+        //  Get all failed login attempts from the last successful login if one can be found
+        $failedUserLoginAttempts = UserLoginAttempt::find($andGroupFilter);
+        $failedUserLoginAttempts->addSort("DateModified", false);
+
+        if ($failedUserLoginAttempts->count() >= AuthenticationSettings::singleton()->numberOfFailedLoginAttemptsThreshold) {
+            $currentDate = new RhubarbDateTime('now');
+
+            //  Check if the most recent Failed Login attempt was within the $totalMinutesToDisableUserAccount set within the AuthenticationSettings
+            $mostRecentFailedLoginAttempt = $failedUserLoginAttempts[0];
+
+            $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateModified);
+            if ($timeDifference->totalMinutes < AuthenticationSettings::singleton()->totalMinutesToDisableUserAccount) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

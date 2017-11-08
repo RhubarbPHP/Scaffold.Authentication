@@ -6,6 +6,7 @@ use Rhubarb\Crown\Application;
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\Sha512HashProvider;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
@@ -15,6 +16,8 @@ use Rhubarb\Scaffolds\Authentication\DatabaseSchema;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Scaffolds\Authentication\UserLoginAttempt;
+use Rhubarb\Scaffolds\Authentication\UserPastPassword;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 class LoginProviderTest extends RhubarbTestCase
@@ -115,6 +118,36 @@ class LoginProviderTest extends RhubarbTestCase
             $loginProvider->login("test", "abc123");
         } catch (LoginExpiredException $exception) {
             $this->fail("Login should not be detected as expired");
+        }
+    }
+
+    public function testNumerousFailedLoginAttempts()
+    {
+        $user = new User();
+        $user->setNewPassword("abc123");
+        $user->Username = "test";
+        $user->Forename = "test";
+        $user->Enabled = 1;
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
+        $user->save();
+
+        //  Adding multiple login attempts
+        AuthenticationSettings::singleton()->disableAccountAfterFailedLoginAttempts = true;
+        AuthenticationSettings::singleton()->numberOfFailedLoginAttemptsThreshold = 10;
+
+        for ($i = 0; $i < 30; $i++) {
+            $pastPassword = new UserLoginAttempt();
+            $pastPassword->EnteredUsername = $user->Username;
+            $pastPassword->Successful = false;
+            $pastPassword->save();
+        }
+
+        try {
+            $loginProvider = LoginProvider::singleton();
+            $loginProvider->login("test", "jibberish");
+            $this->fail("Login should be detected as disabled");
+        } catch (LoginDisabledFailedAttemptsException $exception) {
+
         }
     }
 }

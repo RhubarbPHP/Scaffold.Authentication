@@ -57,6 +57,10 @@ class LoginView extends View
             print '<div class="c-alert c-alert--error">Sorry, this password has now expired, please update your password before logging in.</div>';
         }
 
+        if ($this->model->failedLoginAttempts) {
+            print '<div class="c-alert c-alert--error">Sorry, your login has been disabled due to numerous failed login attempts. Please contact the system administrator to address this issue.</div>';
+        }
+
         ?>
         <fieldset class="c-form c-form--inline">
             <div class="c-form__group">

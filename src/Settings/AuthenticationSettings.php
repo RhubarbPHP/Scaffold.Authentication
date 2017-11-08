@@ -66,4 +66,25 @@ class AuthenticationSettings extends Settings
      * @var int
      */
     public $numberOfPastPasswordsToCompareTo = 0;
+
+    /****** FAILED LOGIN ATTEMPTS SETTINGS ******/
+
+    /**
+     * The following flag is used to check if a users account should be disabled after a set amount of failed login attempts
+     *
+     * @var bool
+     */
+    public $disableAccountAfterFailedLoginAttempts = false;
+
+    /**
+     * The total number of failed login attempts that should be allowed before disabling the users account for a set amount of time
+     * @var int
+     */
+    public $numberOfFailedLoginAttemptsThreshold = 0;
+
+    /**
+     * The total number of minutes a users account should be disabled for when a users account is being marked as disabled
+     * @var int
+     */
+    public $totalMinutesToDisableUserAccount = 0;
 }

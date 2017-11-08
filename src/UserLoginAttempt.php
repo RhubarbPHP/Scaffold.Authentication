@@ -2,10 +2,14 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
+use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Filters\AndGroup;
+use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
 use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
+use Rhubarb\Stem\Schema\Columns\ForeignKeyColumn;
 use Rhubarb\Stem\Schema\Columns\IntegerColumn;
 use Rhubarb\Stem\Schema\Columns\LongStringColumn;
 use Rhubarb\Stem\Schema\Columns\StringColumn;
@@ -38,5 +42,20 @@ class UserLoginAttempt extends Model
         }
 
         parent::beforeSave();
+    }
+
+    public static function getLastSuccessfulLoginAttempt($username)
+    {
+        try {
+            return self::findFirst(new AndGroup(
+                [
+                    new Equals("EnteredUsername", $username),
+                    new Equals("Successful", true)
+                ]
+            ));
+        } catch (RecordNotFoundException $exception) {
+        }
+
+        return null;
     }
 }

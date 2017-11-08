@@ -3,6 +3,7 @@
 namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledException;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Scaffolds\Authentication\UserLoginAttempt;
@@ -12,38 +13,42 @@ trait LogLoginAttemptsTrait
     public function login($username, $password)
     {
         try {
-            $userLoginAttempt = new UserLoginAttempt();
-            $userLoginAttempt->EnteredUsername = $username;
-            $userLoginAttempt->save();
-
             $loginStatus = parent::login($username, $password);
 
             if ($loginStatus) {
-                $userLoginAttempt->Successful = true;
-                $userLoginAttempt->save();
+                $this->createSuccessfulUserLoginAttempt($username);
             }
 
             return $loginStatus;
         } catch (LoginDisabledException $loginDisabledException) {
-            $userLoginAttempt->Successful = false;
-            $userLoginAttempt->ExceptionMessage = (string) $loginDisabledException;
-            $userLoginAttempt->save();
-
+            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledException);
             throw $loginDisabledException;
         } catch (LoginFailedException $loginFailedException) {
-            $userLoginAttempt->Successful = false;
-            $userLoginAttempt->ExceptionMessage = (string) $loginFailedException;
-            $userLoginAttempt->save();
-
+            $this->createFailedUserLoginAttempt($username, (string) $loginFailedException);
             throw $loginFailedException;
         } catch (LoginExpiredException $loginExpiredException) {
-            $userLoginAttempt->Successful = false;
-            $userLoginAttempt->ExceptionMessage = (string) $loginExpiredException;
-            $userLoginAttempt->save();
-
+            $this->createFailedUserLoginAttempt($username, (string) $loginExpiredException);
             throw $loginExpiredException;
+        } catch (LoginDisabledFailedAttemptsException $loginDisabledFailedAttemptsException) {
+            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledFailedAttemptsException);
+            throw $loginDisabledFailedAttemptsException;
         }
+    }
 
-        throw new LoginFailedException();
+    private function createSuccessfulUserLoginAttempt($username)
+    {
+        $userLoginAttempt = new UserLoginAttempt();
+        $userLoginAttempt->EnteredUsername = $username;
+        $userLoginAttempt->Successful = true;
+        $userLoginAttempt->save();
+    }
+
+    private function createFailedUserLoginAttempt($username, $exceptionMessage)
+    {
+        $userLoginAttempt = new UserLoginAttempt();
+        $userLoginAttempt->EnteredUsername = $username;
+        $userLoginAttempt->ExceptionMessage = $exceptionMessage;
+        $userLoginAttempt->Successful = false;
+        $userLoginAttempt->save();
     }
 }

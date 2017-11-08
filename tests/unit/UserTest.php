@@ -151,27 +151,27 @@ class UserTest extends RhubarbTestCase
         $user->LastPasswordChangeDate = new RhubarbDateTime('-4 days');
         $user->save();
 
-        $this->assertTrue($user->hasModelExpired());
+        $this->assertTrue($user->isModelExpired());
 
         $user->LastPasswordChangeDate = new RhubarbDateTime('-3 days');
         $user->save();
 
-        $this->assertFalse($user->hasModelExpired());
+        $this->assertFalse($user->isModelExpired());
 
         $user->LastPasswordChangeDate = new RhubarbDateTime('-2.5 days');
         $user->save();
 
-        $this->assertTrue($user->hasModelExpired());
+        $this->assertTrue($user->isModelExpired());
 
         $user->LastPasswordChangeDate = new RhubarbDateTime('-2 days');
         $user->save();
 
-        $this->assertFalse($user->hasModelExpired());
+        $this->assertFalse($user->isModelExpired());
 
         $user->LastPasswordChangeDate = new RhubarbDateTime('-1 day');
         $user->save();
 
-        $this->assertFalse($user->hasModelExpired());
+        $this->assertFalse($user->isModelExpired());
     }
 
     public function testPreviouslyUsedPassword()
