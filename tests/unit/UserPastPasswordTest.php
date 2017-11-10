@@ -22,7 +22,7 @@ class UserPastPasswordTest extends RhubarbTestCase
 
     public function testRemovePastPasswords()
     {
-        AuthenticationSettings::singleton()->storeUserPasswordChanges = true;
+        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = true;
         AuthenticationSettings::singleton()->totalPreviousPasswordsToStore = 10;
 
         for ($i = 0; $i < 30; $i++) {
@@ -39,7 +39,7 @@ class UserPastPasswordTest extends RhubarbTestCase
 
     public function testMaxPastPasswordsToStore()
     {
-        AuthenticationSettings::singleton()->storeUserPasswordChanges = true;
+        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = true;
         AuthenticationSettings::singleton()->totalPreviousPasswordsToStore = 10;
 
         $user = new User();
@@ -65,7 +65,7 @@ class UserPastPasswordTest extends RhubarbTestCase
 
     public function testDisableStorePastPasswords()
     {
-        AuthenticationSettings::singleton()->storeUserPasswordChanges = false;
+        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = false;
 
         $user = new User();
         $user->Password = "abc123";

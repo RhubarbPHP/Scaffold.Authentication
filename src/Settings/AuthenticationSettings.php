@@ -44,7 +44,7 @@ class AuthenticationSettings extends Settings
      * The following is used to control whether a users previous password should be retained
      * @var bool
      */
-    public $storeUserPasswordChanges = false;
+    public $compareNewUserPasswordWithPreviousEntries = false;
 
     /**
      * Used to validate how many previous passwords should be stored when a user updates their Password

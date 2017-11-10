@@ -274,7 +274,7 @@ class User extends Model implements ValidateLoginModelInterface
     {
         parent::attachPropertyChangedNotificationHandlers();
 
-        if (AuthenticationSettings::singleton()->storeUserPasswordChanges) {
+        if (AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries) {
             $this->addPropertyChangedNotificationHandler('Password', function ($newValue, $propertyName, $oldValue) {
                 $this->performAfterSave(
                     function () use ($propertyName, $oldValue) {

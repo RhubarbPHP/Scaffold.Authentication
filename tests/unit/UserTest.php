@@ -176,7 +176,7 @@ class UserTest extends RhubarbTestCase
 
     public function testPreviouslyUsedPassword()
     {
-        AuthenticationSettings::singleton()->storeUserPasswordChanges = true;
+        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = true;
         AuthenticationSettings::singleton()->totalPreviousPasswordsToStore = 10;
 
         AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo = 10;
