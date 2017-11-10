@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.1.4
+
+* Fixed:	Reset password broken	
+
 ### 1.1.3
 
 * Fixed:	Removed unnecessary second argument to TextBox

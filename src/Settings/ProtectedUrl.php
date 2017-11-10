@@ -2,6 +2,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Settings;
 
+use Rhubarb\Scaffolds\Authentication\Leaves\ActivateAccount;
 use Rhubarb\Scaffolds\Authentication\Leaves\ConfirmResetPassword;
 use Rhubarb\Scaffolds\Authentication\Leaves\Login;
 use Rhubarb\Scaffolds\Authentication\Leaves\Logout;
@@ -18,9 +19,12 @@ class ProtectedUrl
     public $logoutChildUrl = 'logout';
     public $logoutLeafClassName = Logout::class;
 
-    public $resetChildUrl = 'reset';
+    public $resetChildUrl = 'reset/';
     public $resetPasswordLeafClassName = ResetPassword::class;
     public $confirmResetPasswordLeafClassName = ConfirmResetPassword::class;
+
+    public $activateChildUrl = 'activate/';
+    public $activatePasswordLeafClassName = ActivateAccount::class;
 
     public function __construct($urlToProtect, $loginProviderClassName, $loginUrl)
     {
