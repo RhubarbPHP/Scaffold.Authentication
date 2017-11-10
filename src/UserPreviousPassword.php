@@ -12,13 +12,13 @@ use Rhubarb\Stem\Schema\Columns\ForeignKeyColumn;
 use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
-class UserPastPassword extends Model
+class UserPreviousPassword extends Model
 {
     protected function createSchema()
     {
         $schema = new ModelSchema('tblAuthenticationPastPassword');
         $schema->addColumn(
-            new AutoIncrementColumn('UserPastPasswordID'),
+            new AutoIncrementColumn('UserPreviousPasswordID'),
             new ForeignKeyColumn('UserID'),
             new StringColumn("Password", 200),
             new DateTimeColumn('DateCreated')
