@@ -229,22 +229,18 @@ class User extends Model implements ValidateLoginModelInterface
         }
 
         //  Validate new password has not been previously used
-        if ($this->passwordChanged && AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries) {
+        $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo;
+        if ($this->passwordChanged && $numberOfPastPasswordsToCompareTo) {
+            $hashProvider = HashProvider::getProvider();
 
-            $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo;
-            if ($numberOfPastPasswordsToCompareTo) {
+            $userPastPasswords = UserPastPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
+            $userPastPasswords->addSort("DateCreated", false);
+            $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
 
-                $hashProvider = HashProvider::getProvider();
-
-                $userPastPasswords = UserPastPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
-                $userPastPasswords->addSort("DateCreated", false);
-                $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
-
-                foreach ($userPastPasswords as $userPastPassword) {
-                    if ($hashProvider->compareHash($this->Password, $userPastPassword->Password)) {
-                        $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
-                        break;
-                    }
+            foreach ($userPastPasswords as $userPastPassword) {
+                if ($hashProvider->compareHash($this->Password, $userPastPassword->Password)) {
+                    $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
+                    break;
                 }
             }
         }

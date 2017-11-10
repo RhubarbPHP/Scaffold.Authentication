@@ -179,7 +179,6 @@ class UserTest extends RhubarbTestCase
         AuthenticationSettings::singleton()->storeUserPasswordChanges = true;
         AuthenticationSettings::singleton()->totalPreviousPasswordsToStore = 10;
 
-        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = true;
         AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo = 10;
 
         $user = new User();
