@@ -229,11 +229,11 @@ class User extends Model implements ValidateLoginModelInterface
         }
 
         //  Validate new password has not been previously used
-        $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPastPasswordsToCompareTo;
+        $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPreviousPasswordsToCompareTo;
         if ($this->passwordChanged && $numberOfPastPasswordsToCompareTo) {
             $hashProvider = HashProvider::getProvider();
 
-            $userPastPasswords = UserPastPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
+            $userPastPasswords = UserPreviousPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
             $userPastPasswords->addSort("DateCreated", false);
             $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
 
@@ -279,8 +279,8 @@ class User extends Model implements ValidateLoginModelInterface
                 $this->performAfterSave(
                     function () use ($propertyName, $oldValue) {
                         if ($propertyName == "Password" && !empty($oldValue) && $this->Password != $oldValue) {
-                            UserPastPassword::removePreviousPasswords($this->UniqueIdentifier);
-                            $userPastPassword = new UserPastPassword();
+                            UserPreviousPassword::removePreviousPasswords($this->UniqueIdentifier);
+                            $userPastPassword = new UserPreviousPassword();
                             $userPastPassword->UserID = $this->UniqueIdentifier;
                             $userPastPassword->Password = $oldValue;
                             $userPastPassword->save();

@@ -17,7 +17,7 @@ use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Scaffolds\Authentication\UserLoginAttempt;
-use Rhubarb\Scaffolds\Authentication\UserPastPassword;
+use Rhubarb\Scaffolds\Authentication\UserPreviousPassword;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
 class LoginProviderTest extends RhubarbTestCase

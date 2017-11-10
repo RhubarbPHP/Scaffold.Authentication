@@ -60,7 +60,7 @@ class AuthenticationSettings extends Settings
      *
      * @var int
      */
-    public $numberOfPastPasswordsToCompareTo = 0;
+    public $numberOfPreviousPasswordsToCompareTo = 0;
 
     /****** FAILED LOGIN ATTEMPTS SETTINGS ******/
 
