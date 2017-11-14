@@ -71,8 +71,8 @@ class LoginProvider extends ModelLoginProvider
     {
         $settings = new LoginProviderSettings();
         $settings->identityColumnName = $this->usernameColumnName;
-        $settings->compareNewUserPasswordWithPreviousEntries = 3;
         $settings->lockoutAccountAfterFailedLoginAttempts = true;
+        $settings->numberOfFailedLoginAttemptsBeforeLockout = 3;
         $settings->numberOfPreviousPasswordsToCompareTo = 3;
         $settings->totalPreviousPasswordsToStore = 5;
         $settings->totalMinutesToLockUserAccount = 10;
@@ -234,7 +234,7 @@ class LoginProvider extends ModelLoginProvider
      */
     protected function checkUserIsPermitted($user)
     {
-        if (!isset($activeUser)) {
+        if (!isset($user)) {
             Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the user is disabled.", "LOGIN");
             throw new LoginDisabledException();
         }
@@ -279,18 +279,18 @@ class LoginProvider extends ModelLoginProvider
         }
 
         $andGroupFilter = new AndGroup();
-        $andGroupFilter->addFilters(new Equals("EnteredUsername", $user->Username));
+        $andGroupFilter->addFilters(new Equals("EnteredUsername", $user[$settings->identityColumnName]));
         $andGroupFilter->addFilters(new Equals("Successful", false));
 
         // Retrieve last successful login attempt
-        $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user->Username);
+        $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user[$settings->identityColumnName]);
         if ($lastSuccesfulLoginAttempt) {
             $andGroupFilter->addFilters(new GreaterThan("UserLoginAttemptID", $lastSuccesfulLoginAttempt->UserLoginAttemptID));
         }
 
         //  Get all failed login attempts from the last successful login if one can be found
         $failedUserLoginAttempts = UserLog::find($andGroupFilter);
-        $failedUserLoginAttempts->addSort("DateModified", false);
+        $failedUserLoginAttempts->addSort("DateCreated", false);
 
         if ($failedUserLoginAttempts->count() >= $settings->numberOfFailedLoginAttemptsBeforeLockout) {
             $currentDate = new RhubarbDateTime('now');
@@ -298,7 +298,7 @@ class LoginProvider extends ModelLoginProvider
             //  Check if the most recent Failed Login attempt was within the $totalMinutesToDisableUserAccount set within the AuthenticationSettings
             $mostRecentFailedLoginAttempt = $failedUserLoginAttempts[0];
 
-            $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateModified);
+            $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateCreated);
             if ($timeDifference->totalMinutes < $settings->totalMinutesToLockUserAccount) {
                 return false;
             } else {

@@ -32,7 +32,8 @@ class UserLog extends Model
             new AutoIncrementColumn('UserLogID'),
             new ForeignKeyColumn('UserID'),
             new StringColumn('EnteredUsername', 200),
-            new MySqlEnumColumn("LogType", null, [
+            new MySqlEnumColumn("LogType", '', [
+                '',
                 self::USER_LOG_LOGIN_SUCCESSFUL,
                 self::USER_LOG_LOGIN_LOCKED,
                 self::USER_LOG_LOGIN_FAILED,

@@ -74,31 +74,30 @@ class AuthenticationModule extends Module
     {
         foreach ($this->protectedUrls as $url) {
 
-            $provider = $url->loginProviderClassName;
+            $providerClassName = $url->loginProviderClassName;
+            $provider = $providerClassName::singleton();
 
             $this->addUrlHandlers([
-                $url->loginUrl => $login = new CallableUrlHandler(function () use ($url) {
+                $url->loginUrl => $login = new CallableUrlHandler(function () use ($url, $provider) {
                     $className = $url->loginLeafClassName;
-                    $provider = $className::singleton();
                     return new $className($provider);
                 }, [
-                    $url->confirmResetChildUrl => $confirmReset = new GreedyUrlHandler(function($captured) use ($url){
-                        $className = $url->confirmResetPasswordLeafClassName;
-                        $provider = $className::singleton();
-                        return new $className($provider, $captured);
-                    }),
-                    $url->resetChildUrl => $reset = new CallableUrlHandler(function() use ($url){
+                    $url->resetChildUrl => $reset = new CallableUrlHandler(function() use ($url, $provider){
                         $className = $url->resetPasswordLeafClassName;
-                        $provider = $className::singleton();
                         return new $className($provider);
-                    }),
-                    $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url) {
+                    },[
+                        '' => $confirmReset = new GreedyUrlHandler(function($parentHandler, $captured) use ($url, $provider){
+                            $className = $url->confirmResetPasswordLeafClassName;
+                            return new $className($provider, $captured);
+                        })
+                    ]),
+                    $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url, $provider) {
                         $className = $url->logoutLeafClassName;
-                        return new $className($url->loginProviderClassName);
+                        return new $className($provider, $url->loginProviderClassName);
                     })
                 ]),
                 $url->urlToProtect => $protected =
-                    new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
+                    new ValidateLoginUrlHandler($provider, $url->loginUrl),
             ]);
 
             // Make sure that the login url handlers are given greater precedence than those of the application.

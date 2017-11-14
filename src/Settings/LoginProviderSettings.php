@@ -23,13 +23,6 @@ class LoginProviderSettings
      */
     public $passwordExpirationIntervalInDays = 0;
 
-
-    /**
-     * The following is used to control whether a users previous password should be retained
-     * @var bool
-     */
-    public $compareNewUserPasswordWithPreviousEntries = false;
-
     /**
      * Used to validate how many previous passwords should be stored when a user updates their Password
      * @var int

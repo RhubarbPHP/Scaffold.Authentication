@@ -25,9 +25,10 @@ class ResetPassword extends LoginProviderLeaf
     protected function initiateResetPassword()
     {
         try {
-            $user = User::fromIdentifierColumnValue($this->model->username);
-            $user->generatePasswordResetHash();
+            $provider = $this->getLoginProvider();
 
+            $user = User::fromIdentifierColumnValue($provider->getLoginProviderSettings()->identityColumnName, $this->model->username);
+            $user->generatePasswordResetHash();
             /**
              * @var ResetPasswordInvitationEmail $resetPasswordEmail
              */
@@ -59,6 +60,7 @@ class ResetPassword extends LoginProviderLeaf
     protected function createModel()
     {
         $model = new ResetPasswordModel();
+        $model->identityColumnName = $this->getLoginProvider()->getLoginProviderSettings()->identityColumnName;
         $model->resetPasswordEvent->attachHandler(function(){
             $this->initiateResetPassword();
         });

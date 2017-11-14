@@ -38,7 +38,7 @@ use Rhubarb\Stem\Schema\Columns\DateTimeColumn;
 use Rhubarb\Stem\Schema\Columns\StringColumn;
 use Rhubarb\Stem\Schema\ModelSchema;
 
-class User extends Model implements ValidateLoginModelInterface
+class User extends Model
 {
     /**
      * This flag is used to check whether a password has been changed and needs to be validated
@@ -131,33 +131,20 @@ class User extends Model implements ValidateLoginModelInterface
      * @param $username
      * @return User
      * @throws \Rhubarb\Stem\Exceptions\RecordNotFoundException
-     * @deprecated
+     * @deprecated Use fromIdentifierColumnValue instead.
      */
     public static function fromUsername($username)
     {
-        return self::fromIdentifierColumnValue($username);
+        return self::fromIdentifierColumnValue('Username', $username);
     }
 
     /**
      * @param mixed $value
      * @return Model|static
      */
-    public static function fromIdentifierColumnValue($value)
+    public static function fromIdentifierColumnValue($identityColumnName, $value)
     {
-        $settings = AuthenticationSettings::singleton();
-        return self::findFirst(new Equals($settings->identityColumnName, $value));
-    }
-
-    /**
-     * Returns the logged in User model
-     *
-     * @throws NotLoggedInException
-     */
-    public static function getLoggedInUser()
-    {
-        $loginProvider = LoginProvider::getProvider();
-
-        return $loginProvider->getModel();
+        return self::findFirst(new Equals($identityColumnName, $value));
     }
 
     /**
@@ -199,8 +186,7 @@ class User extends Model implements ValidateLoginModelInterface
         $errors = parent::getConsistencyValidationErrors();
 
         if ($this->Enabled) {
-            $settings = AuthenticationSettings::singleton();
-            $identityColumnName = $settings->identityColumnName;
+            $identityColumnName = 'Username';
 
             // See if the identity is in use.
             $identityFilter = new Equals($identityColumnName, $this->$identityColumnName);
