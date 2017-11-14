@@ -233,12 +233,16 @@ class User extends Model implements ValidateLoginModelInterface
         if ($this->passwordChanged && $numberOfPastPasswordsToCompareTo) {
             $hashProvider = HashProvider::getProvider();
 
-            $userPastPasswords = UserPreviousPassword::find(new Equals($this->UniqueIdentifierColumnName, $this->UniqueIdentifier));
+            $userPastPasswords = UserLog::find(
+                new Equals("LogType", UserLog::USER_LOG_PASSWORD_CHANGED),
+                new Equals("UserID", $this->UniqueIdentifier)
+            );
+
             $userPastPasswords->addSort("DateCreated", false);
             $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
 
             foreach ($userPastPasswords as $userPastPassword) {
-                if ($hashProvider->compareHash($this->Password, $userPastPassword->Password)) {
+                if ($hashProvider->compareHash($this->Password, $userPastPassword->Data)) {
                     $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
                     break;
                 }
@@ -279,7 +283,19 @@ class User extends Model implements ValidateLoginModelInterface
                 $this->performAfterSave(
                     function () use ($propertyName, $oldValue) {
                         if ($propertyName == "Password" && !empty($oldValue) && $this->Password != $oldValue) {
-                            UserPreviousPassword::removePreviousPasswords($this->UniqueIdentifier);
+
+                            $previousPasswords = self::find(new Equals("UserID", $userID));
+                            $previousPasswords->addSort("DateCreated", false);
+
+                            $totalPreviousPasswordsToStore = AuthenticationSettings::singleton()->totalPreviousPasswordsToStore;
+                            if ($previousPasswords->count() >= $totalPreviousPasswordsToStore) {
+                                $previousPasswords->setRange($totalPreviousPasswordsToStore - 1, 200);
+                                foreach ($previousPasswords as $passwordToRemove)
+                                {
+                                    $passwordToRemove->delete();
+                                }
+                            }
+
                             $userPastPassword = new UserPreviousPassword();
                             $userPastPassword->UserID = $this->UniqueIdentifier;
                             $userPastPassword->Password = $oldValue;
@@ -289,60 +305,5 @@ class User extends Model implements ValidateLoginModelInterface
                 );
             });
         }
-    }
-
-    public function isModelExpired()
-    {
-        $passwordExpirationDaysInterval = AuthenticationSettings::singleton()->passwordExpirationIntervalInDays;
-
-        /** @var $lastPasswordChangeDate \Rhubarb\Crown\DateTime\RhubarbDateTime */
-        $lastPasswordChangeDate = $this->LastPasswordChangeDate;
-        $currentDate = new RhubarbDateTime('now');
-
-        if ($passwordExpirationDaysInterval && $lastPasswordChangeDate && $lastPasswordChangeDate->isValidDateTime()) {
-            $timeDifference = $currentDate->diff($lastPasswordChangeDate);
-            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function isModelDisabled()
-    {
-        if (!AuthenticationSettings::singleton()->disableAccountAfterFailedLoginAttempts) {
-            return false;
-        }
-
-        $andGroupFilter = new AndGroup();
-        $andGroupFilter->addFilters(new Equals("EnteredUsername", $this->Username));
-        $andGroupFilter->addFilters(new Equals("Successful", false));
-
-        // Retrieve last successful login attempt
-        $lastSuccesfulLoginAttempt = UserLoginAttempt::getLastSuccessfulLoginAttempt($this->Username);
-        if ($lastSuccesfulLoginAttempt) {
-            $andGroupFilter->addFilters(new GreaterThan("UserLoginAttemptID", $lastSuccesfulLoginAttempt->UserLoginAttemptID));
-        }
-
-        //  Get all failed login attempts from the last successful login if one can be found
-        $failedUserLoginAttempts = UserLoginAttempt::find($andGroupFilter);
-        $failedUserLoginAttempts->addSort("DateModified", false);
-
-        if ($failedUserLoginAttempts->count() >= AuthenticationSettings::singleton()->numberOfFailedLoginAttemptsThreshold) {
-            $currentDate = new RhubarbDateTime('now');
-
-            //  Check if the most recent Failed Login attempt was within the $totalMinutesToDisableUserAccount set within the AuthenticationSettings
-            $mostRecentFailedLoginAttempt = $failedUserLoginAttempts[0];
-
-            $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateModified);
-            if ($timeDifference->totalMinutes < AuthenticationSettings::singleton()->totalMinutesToDisableUserAccount) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

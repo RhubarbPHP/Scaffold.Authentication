@@ -16,7 +16,7 @@ use Rhubarb\Scaffolds\Authentication\DatabaseSchema;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
-use Rhubarb\Scaffolds\Authentication\UserLoginAttempt;
+use Rhubarb\Scaffolds\Authentication\UserLog;
 use Rhubarb\Scaffolds\Authentication\UserPreviousPassword;
 use Rhubarb\Stem\Schema\SolutionSchema;
 
@@ -136,7 +136,7 @@ class LoginProviderTest extends RhubarbTestCase
         AuthenticationSettings::singleton()->numberOfFailedLoginAttemptsThreshold = 10;
 
         for ($i = 0; $i < 30; $i++) {
-            $pastPassword = new UserLoginAttempt();
+            $pastPassword = new UserLog();
             $pastPassword->EnteredUsername = $user->Username;
             $pastPassword->Successful = false;
             $pastPassword->save();

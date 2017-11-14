@@ -1,12 +1,16 @@
 # Change Log
 
+### 1.2.0
+
+* Changed:      Supports Stem 1.5 with basic model login behaviours moved into this library.
+
 ### 1.1.4
 
-* Fixed:	Reset password broken	
+* Fixed:	    Reset password broken	
 
 ### 1.1.3
 
-* Fixed:	Removed unnecessary second argument to TextBox
+* Fixed:	    Removed unnecessary second argument to TextBox
 
 ### 1.1.2
 
@@ -14,7 +18,7 @@
 
 ### 1.1.1
 
-* Fix:		Fixed backwards issue with default provider not being registered
+* Fix:		    Fixed backwards issue with default provider not being registered
 
 ### 1.1.0
 

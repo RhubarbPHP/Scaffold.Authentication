@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2016 RhubarbPHP.
  *
@@ -15,14 +16,17 @@
  * limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication\Settings;
+namespace Rhubarb\Scaffolds\Authentication\Exceptions;
 
-use Rhubarb\Crown\Settings;
+use Exception;
+use Rhubarb\Crown\Exceptions\RhubarbException;
 
-/**
- * Placeholder for future use.
- */
-class AuthenticationSettings extends Settings
+class LoginFailedException extends RhubarbException
 {
+    public function __construct($privateMessage = "", \Exception $previous = null)
+    {
+        parent::__construct($privateMessage, $previous);
 
+        $this->publicMessage = "Sorry, we failed to authenticate your credentials at this time.";
+    }
 }

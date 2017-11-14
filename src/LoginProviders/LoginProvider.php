@@ -18,29 +18,66 @@
 
 namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
+use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Http\HttpResponse;
-use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledFailedAttemptsException;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginFailedException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
+use Rhubarb\Scaffolds\Authentication\Settings\LoginProviderSettings;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Scaffolds\Authentication\UserLog;
+use Rhubarb\Stem\Collections\RepositoryCollection;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Filters\AndGroup;
+use Rhubarb\Stem\Filters\Equals;
+use Rhubarb\Stem\Filters\GreaterThan;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
 class LoginProvider extends ModelLoginProvider
 {
+    protected $usernameColumnName = "";
+    protected $passwordColumnName = "";
+    protected $activeColumnName = "";
+
     /**
      * @param string $modelClassName
      * @param string|null $usernameColumnName Leave null to inherit from AuthenticationSettings::$identifyColumnName (Username by default)
      * @param string $passwordColumnName
      * @param string $activeColumnName
      */
-    public function __construct($modelClassName = "User", $usernameColumnName = null, $passwordColumnName = "Password", $activeColumnName = "Enabled")
+    public function __construct($modelClassName = "User", $usernameColumnName = "Username", $passwordColumnName = "Password", $activeColumnName = "Enabled")
     {
-        if($usernameColumnName === null) {
-            $settings = AuthenticationSettings::singleton();
-            $usernameColumnName = $settings->identityColumnName;
-        }
-        parent::__construct($modelClassName, $usernameColumnName, $passwordColumnName, $activeColumnName);
+        parent::__construct($modelClassName);
+
+        $this->usernameColumnName = $usernameColumnName;
+        $this->passwordColumnName = $passwordColumnName;
+        $this->activeColumnName = $activeColumnName;
+    }
+
+    /**
+     * Returns the configuration options for this login provider.
+     *
+     * The exposing of these properties allows for other systems (such as the UI) to match
+     * the validated behaviour of the login provider.
+     *
+     * @return LoginProviderSettings
+     */
+    protected function getLoginProviderSettings()
+    {
+        $settings = new LoginProviderSettings();
+        $settings->identityColumnName = $this->usernameColumnName;
+        $settings->compareNewUserPasswordWithPreviousEntries = 3;
+        $settings->lockoutAccountAfterFailedLoginAttempts = true;
+        $settings->numberOfPreviousPasswordsToCompareTo = 3;
+        $settings->totalPreviousPasswordsToStore = 5;
+        $settings->totalMinutesToLockUserAccount = 10;
+
+        return $settings;
     }
 
     protected function initialiseDefaultValues()
@@ -50,9 +87,205 @@ class LoginProvider extends ModelLoginProvider
         $this->detectRememberMe();
     }
 
+    protected function isModelActive($model)
+    {
+        return ($model[$this->activeColumnName] == true);
+    }
+
+    public function login($username, $password)
+    {
+        try {
+            $loginStatus = $this->attemptLogin($username, $password);
+
+            if ($loginStatus) {
+                $this->createSuccessfulUserLoginAttempt($username);
+            }
+
+            return $loginStatus;
+        } catch (LoginDisabledException $loginDisabledException) {
+            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledException);
+            throw $loginDisabledException;
+        } catch (LoginFailedException $loginFailedException) {
+            $this->createFailedUserLoginAttempt($username, (string) $loginFailedException);
+            throw $loginFailedException;
+        } catch (LoginExpiredException $loginExpiredException) {
+            $this->createFailedUserLoginAttempt($username, (string) $loginExpiredException);
+            throw $loginExpiredException;
+        } catch (LoginDisabledFailedAttemptsException $loginDisabledFailedAttemptsException) {
+            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledFailedAttemptsException);
+            throw $loginDisabledFailedAttemptsException;
+        }
+    }
+
+    protected function attemptLogin($username, $password)
+    {
+        // We don't allow spaces around our usernames and passwords
+        $username = trim($username);
+        $password = trim($password);
+
+        if ($username == "") {
+            throw new LoginFailedException();
+        }
+
+        $list = new RepositoryCollection($this->modelClassName);
+        $list->filter(new Equals($this->usernameColumnName, $username));
+
+        if (!sizeof($list)) {
+            Log::debug("Login failed for {$username} - the username didn't match a user", "LOGIN");
+            throw new LoginFailedException();
+        }
+
+        $hashProvider = HashProvider::getProvider();
+
+        // There should only be one user matching the username. It would be possible to support
+        // unique *combinations* of username and password but it's a potential security issue and
+        // could trip us up when supporting the project.
+        $existingActiveUsers = 0;
+        foreach ($list as $user) {
+            if ($this->isModelActive($user)) {
+                $activeUser = $user;
+                $existingActiveUsers++;
+            }
+
+            if ($existingActiveUsers > 1) {
+                Log::debug("Login failed for {$username} - the username wasn't unique", "LOGIN");
+                throw new LoginFailedException();
+            }
+        }
+
+        $this->checkUserIsPermitted($activeUser);
+
+        // Test the password matches.
+        $userPasswordHash = $activeUser[$this->passwordColumnName];
+
+        if ($hashProvider->compareHash($password, $userPasswordHash)) {
+            $this->loggedIn = true;
+            $this->loggedInUserIdentifier = $activeUser->getUniqueIdentifier();
+
+            $this->storeSession();
+
+            return true;
+        }
+
+        Log::debug("Login failed for {$username} - the password hash $userPasswordHash didn't match the stored hash.", "LOGIN");
+
+        throw new LoginFailedException();
+    }
+
+    /**
+     * Provides an opportunity for extending classes to do additional checks on the user object before
+     * allowing them to login.
+     *
+     * You should throw an exception if you want to prevent the login.
+     *
+     * @param $user
+     * @throws \Exception Thrown if the user should not be permitted to login.
+     */
+    protected function checkUserIsPermitted($user)
+    {
+        if (!isset($activeUser)) {
+            Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the user is disabled.", "LOGIN");
+            throw new LoginDisabledException();
+        }
+
+        if ($this->hasPasswordExpired($user)){
+            Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the password has expired.", "LOGIN");
+            throw new LoginExpiredException();
+        }
+
+        if ($this->isUserTemporarilyLockedOut($user)){
+            Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the user is temporarily disabled.", "LOGIN");
+            throw new LoginExpiredException();
+        }
+    }
+
+    public function hasPasswordExpired(User $user)
+    {
+        $settings = $this->getLoginProviderSettings();
+
+        $passwordExpirationDaysInterval = $settings->passwordExpirationIntervalInDays;
+
+        /** @var $lastPasswordChangeDate \Rhubarb\Crown\DateTime\RhubarbDateTime */
+        $lastPasswordChangeDate = $user->LastPasswordChangeDate;
+        $currentDate = new RhubarbDateTime('now');
+
+        if ($passwordExpirationDaysInterval && $lastPasswordChangeDate && $lastPasswordChangeDate->isValidDateTime()) {
+            $timeDifference = $currentDate->diff($lastPasswordChangeDate);
+            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isUserTemporarilyLockedOut(User $user)
+    {
+        $settings = $this->getLoginProviderSettings();
+
+        if (!$settings->lockoutAccountAfterFailedLoginAttempts) {
+            return false;
+        }
+
+        $andGroupFilter = new AndGroup();
+        $andGroupFilter->addFilters(new Equals("EnteredUsername", $user->Username));
+        $andGroupFilter->addFilters(new Equals("Successful", false));
+
+        // Retrieve last successful login attempt
+        $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user->Username);
+        if ($lastSuccesfulLoginAttempt) {
+            $andGroupFilter->addFilters(new GreaterThan("UserLoginAttemptID", $lastSuccesfulLoginAttempt->UserLoginAttemptID));
+        }
+
+        //  Get all failed login attempts from the last successful login if one can be found
+        $failedUserLoginAttempts = UserLog::find($andGroupFilter);
+        $failedUserLoginAttempts->addSort("DateModified", false);
+
+        if ($failedUserLoginAttempts->count() >= $settings->numberOfFailedLoginAttemptsBeforeLockout) {
+            $currentDate = new RhubarbDateTime('now');
+
+            //  Check if the most recent Failed Login attempt was within the $totalMinutesToDisableUserAccount set within the AuthenticationSettings
+            $mostRecentFailedLoginAttempt = $failedUserLoginAttempts[0];
+
+            $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateModified);
+            if ($timeDifference->totalMinutes < $settings->totalMinutesToLockUserAccount) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function createSuccessfulUserLoginAttempt($username)
+    {
+        $userLoginAttempt = new UserLog();
+        $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_SUCCESSFUL;
+        $userLoginAttempt->EnteredUsername = $username;
+        $userLoginAttempt->save();
+    }
+
+    private function createFailedUserLoginAttempt($username, $exceptionMessage)
+    {
+        $userLoginAttempt = new UserLog();
+        $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_FAILED;
+        $userLoginAttempt->EnteredUsername = $username;
+        $userLoginAttempt->Message = $exceptionMessage;
+        $userLoginAttempt->save();
+    }
+
+    protected function getUsername()
+    {
+        $user = $this->getModel();
+
+        return $user->{$this->usernameColumnName};
+    }
+
     public function rememberLogin()
     {
         $user = $this->getLoggedInUser();
+
         HttpResponse::setCookie('lun', $this->getUsername());
         HttpResponse::setCookie('ltk', $user->createToken());
     }

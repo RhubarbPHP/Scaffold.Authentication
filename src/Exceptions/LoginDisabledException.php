@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2016 RhubarbPHP.
  *
@@ -15,14 +16,14 @@
  * limitations under the License.
  */
 
-namespace Rhubarb\Scaffolds\Authentication\Settings;
+namespace Rhubarb\Scaffolds\Authentication\Exceptions;
 
-use Rhubarb\Crown\Settings;
-
-/**
- * Placeholder for future use.
- */
-class AuthenticationSettings extends Settings
+class LoginDisabledException extends LoginFailedException
 {
+    public function __construct($privateMessage = "", \Exception $previous = null)
+    {
+        parent::__construct($privateMessage, $previous);
 
+        $this->publicMessage = "Sorry, your login has been deactivated. Please contact the system administrator if you feel this is a mistake.";
+    }
 }
