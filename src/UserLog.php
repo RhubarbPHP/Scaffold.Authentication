@@ -62,7 +62,7 @@ class UserLog extends Model
     public static function getLastSuccessfulLoginAttempt($username)
     {
         try {
-            return self::findFirst(new AndGroup(
+            return self::findLast(new AndGroup(
                 [
                     new Equals("EnteredUsername", $username),
                     new Equals("LogType", self::USER_LOG_LOGIN_SUCCESSFUL)
