@@ -20,17 +20,14 @@ namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledException;
-use Rhubarb\Crown\LoginProviders\Exceptions\LoginDisabledFailedAttemptsException;
-use Rhubarb\Crown\LoginProviders\Exceptions\LoginExpiredException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
-use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
-use Rhubarb\Leaf\Leaves\Leaf;
+use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 
-class Login extends Leaf
+class Login extends LoginProviderLeaf
 {
     protected $loginProviderClassName = "";
 
@@ -39,33 +36,11 @@ class Login extends Leaf
      */
     protected $model;
 
-    /**
-     * @param string $loginProviderClassName If not supplied, the default login provider will be used.
-     */
-    public function __construct($loginProviderClassName = null)
+    public function __construct(LoginProvider $loginProvider)
     {
-        parent::__construct();
+        parent::__construct($loginProvider);
 
-        $settings = AuthenticationSettings::singleton();
-
-        $this->loginProviderClassName = $loginProviderClassName;
-        $this->model->identityColumnName = $settings->identityColumnName;
-    }
-
-    /**
-     * Returns the login provider for this presenter.
-     *
-     * @return \Rhubarb\Stem\LoginProviders\ModelLoginProvider
-     */
-    private function getLoginProvider()
-    {
-        $provider = $this->loginProviderClassName;
-
-        if ($provider == "") {
-            return LoginProvider::getProvider();
-        }
-
-        return $provider::singleton();
+        $this->model->identityColumnName = $this->getLoginProvider()->getLoginProviderSettings()->identityColumnName;
     }
 
     protected function onSuccess()

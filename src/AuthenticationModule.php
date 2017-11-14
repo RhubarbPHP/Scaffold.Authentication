@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
+use Rhubarb\Crown\UrlHandlers\GreedyUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
@@ -37,10 +38,9 @@ class AuthenticationModule extends Module
      * @param string $urlToProtect Optional. The URL stub to protect by requiring a login. Defaults to
      *                                  the entire URL tree.
      * @param string $loginUrl The URL to redirect the user to for logging in
-     * @param bool $enablePasswordChangeLog Store recent password changes
      * @internal param string $identityColumnName The name of the column in the user table storing the login identity.
      */
-    public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/', $enablePasswordChangeLog = false)
+    public function __construct($loginProviderClassName = null, $urlToProtect = '/', $loginUrl = '/login/')
     {
         parent::__construct();
 
@@ -55,8 +55,6 @@ class AuthenticationModule extends Module
                 $loginUrl
             ));
         }
-
-        AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries = $enablePasswordChangeLog;
     }
 
     public function registerProtectedUrl(ProtectedUrl $urlToProtect)
@@ -81,16 +79,23 @@ class AuthenticationModule extends Module
             $this->addUrlHandlers([
                 $url->loginUrl => $login = new CallableUrlHandler(function () use ($url) {
                     $className = $url->loginLeafClassName;
-                    return new $className($url->loginProviderClassName);
+                    $provider = $className::singleton();
+                    return new $className($provider);
                 }, [
-                    $url->resetChildUrl => $reset = new LeafCollectionUrlHandler(
-                        $url->resetPasswordLeafClassName,
-                        $url->confirmResetPasswordLeafClassName
-                    ),
+                    $url->confirmResetChildUrl => $confirmReset = new GreedyUrlHandler(function($captured) use ($url){
+                        $className = $url->confirmResetPasswordLeafClassName;
+                        $provider = $className::singleton();
+                        return new $className($provider, $captured);
+                    }),
+                    $url->resetChildUrl => $reset = new CallableUrlHandler(function() use ($url){
+                        $className = $url->resetPasswordLeafClassName;
+                        $provider = $className::singleton();
+                        return new $className($provider);
+                    }),
                     $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url) {
                         $className = $url->logoutLeafClassName;
                         return new $className($url->loginProviderClassName);
-                    }),
+                    })
                 ]),
                 $url->urlToProtect => $protected =
                     new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
@@ -105,6 +110,9 @@ class AuthenticationModule extends Module
 
             $reset->setPriority(10);
             $reset->setName('reset');
+
+            $confirmReset->setPriority(10);
+            $confirmReset->setName('confirmReset');
 
             $protected->setPriority(10);
         }

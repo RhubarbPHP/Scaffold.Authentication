@@ -13,7 +13,7 @@ use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 /**
  * A presenter that allows a user to reset their password.
  */
-class ResetPassword extends Leaf
+class ResetPassword extends LoginProviderLeaf
 {
     protected $usernameNotFound = false;
 

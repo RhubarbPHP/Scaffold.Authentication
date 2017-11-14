@@ -228,27 +228,6 @@ class User extends Model implements ValidateLoginModelInterface
             }
         }
 
-        //  Validate new password has not been previously used
-        $numberOfPastPasswordsToCompareTo = AuthenticationSettings::singleton()->numberOfPreviousPasswordsToCompareTo;
-        if ($this->passwordChanged && $numberOfPastPasswordsToCompareTo) {
-            $hashProvider = HashProvider::getProvider();
-
-            $userPastPasswords = UserLog::find(
-                new Equals("LogType", UserLog::USER_LOG_PASSWORD_CHANGED),
-                new Equals("UserID", $this->UniqueIdentifier)
-            );
-
-            $userPastPasswords->addSort("DateCreated", false);
-            $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
-
-            foreach ($userPastPasswords as $userPastPassword) {
-                if ($hashProvider->compareHash($this->Password, $userPastPassword->Data)) {
-                    $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
-                    break;
-                }
-            }
-        }
-
         return $errors;
     }
 
@@ -272,38 +251,5 @@ class User extends Model implements ValidateLoginModelInterface
 
         $hashProvider = HashProvider::getProvider();
         return $hashProvider->compareHash($this->getSavedPasswordTokenData(), $token);
-    }
-
-    protected function attachPropertyChangedNotificationHandlers()
-    {
-        parent::attachPropertyChangedNotificationHandlers();
-
-        if (AuthenticationSettings::singleton()->compareNewUserPasswordWithPreviousEntries) {
-            $this->addPropertyChangedNotificationHandler('Password', function ($newValue, $propertyName, $oldValue) {
-                $this->performAfterSave(
-                    function () use ($propertyName, $oldValue) {
-                        if ($propertyName == "Password" && !empty($oldValue) && $this->Password != $oldValue) {
-
-                            $previousPasswords = self::find(new Equals("UserID", $userID));
-                            $previousPasswords->addSort("DateCreated", false);
-
-                            $totalPreviousPasswordsToStore = AuthenticationSettings::singleton()->totalPreviousPasswordsToStore;
-                            if ($previousPasswords->count() >= $totalPreviousPasswordsToStore) {
-                                $previousPasswords->setRange($totalPreviousPasswordsToStore - 1, 200);
-                                foreach ($previousPasswords as $passwordToRemove)
-                                {
-                                    $passwordToRemove->delete();
-                                }
-                            }
-
-                            $userPastPassword = new UserPreviousPassword();
-                            $userPastPassword->UserID = $this->UniqueIdentifier;
-                            $userPastPassword->Password = $oldValue;
-                            $userPastPassword->save();
-                        }
-                    }
-                );
-            });
-        }
     }
 }

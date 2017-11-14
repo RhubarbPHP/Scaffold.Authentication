@@ -67,7 +67,7 @@ class LoginProvider extends ModelLoginProvider
      *
      * @return LoginProviderSettings
      */
-    protected function getLoginProviderSettings()
+    public function getLoginProviderSettings()
     {
         $settings = new LoginProviderSettings();
         $settings->identityColumnName = $this->usernameColumnName;
@@ -170,6 +170,57 @@ class LoginProvider extends ModelLoginProvider
         Log::debug("Login failed for {$username} - the password hash $userPasswordHash didn't match the stored hash.", "LOGIN");
 
         throw new LoginFailedException();
+    }
+    
+    public function changePassword(User $user, $password)
+    {
+        //  Validate new password has not been previously used
+        $numberOfPastPasswordsToCompareTo = $this->getLoginProviderSettings()->numberOfPreviousPasswordsToCompareTo;
+
+        if ($numberOfPastPasswordsToCompareTo) {
+            $hashProvider = HashProvider::getProvider();
+
+            $userPastPasswords = UserLog::find(
+                new Equals("LogType", UserLog::USER_LOG_PASSWORD_CHANGED),
+                new Equals("UserID", $user->UniqueIdentifier)
+            );
+
+            $userPastPasswords->addSort("DateCreated", false);
+            $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
+
+            foreach ($userPastPasswords as $log) {
+                if ($hashProvider->compareHash($user->Password, $log->Data)) {
+                    $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
+                    break;
+                }
+            }
+        }
+
+        $user->setNewPassword($password);
+        $user->save();
+
+        // Only keep a fixed number of passwords. We keep the log entry but clear the 'data' - no point
+        // keeping a trove of hashed passwords for someone to steal!
+        $previousPasswordLogs = UserLog::find(
+            new Equals("LogType", UserLog::USER_LOG_PASSWORD_CHANGED),
+            new Equals("UserID", $user->UniqueIdentifier)
+        );
+
+        if ($previousPasswordLogs->count() >= $numberOfPastPasswordsToCompareTo) {
+            $previousPasswordLogs->setRange($numberOfPastPasswordsToCompareTo - 1, 200);
+            foreach ($previousPasswordLogs as $passwordToRemove)
+            {
+                $passwordToRemove->Data = '';
+                $passwordToRemove->save();
+            }
+        }
+
+        $log = new UserLog();
+        $log->UserID = $user->UniqueIdentifier;
+        $log->LogType = UserLog::USER_LOG_PASSWORD_CHANGED;
+        $log->Data = $user->Password;
+        $log->save();
+        
     }
 
     /**
