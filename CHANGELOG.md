@@ -3,6 +3,9 @@
 ### 1.2.0
 
 * Changed:      Supports Stem 1.5 with basic model login behaviours moved into this library.
+* Changed:      Login settings are now part of the login provider and passed to all UI leaves
+                properly allowing completely independent login providers to work concurrently
+                with different settings in the same application.
 
 ### 1.1.4
 
