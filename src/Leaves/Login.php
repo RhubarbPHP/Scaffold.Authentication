@@ -23,7 +23,7 @@ use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
-use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledFailedAttemptsException;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginFailedException;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
@@ -41,7 +41,7 @@ class Login extends LoginProviderLeaf
     {
         parent::__construct($loginProvider);
 
-        $this->model->identityColumnName = $this->getLoginProvider()->getLoginProviderSettings()->identityColumnName;
+        $this->model->identityColumnName = $this->getLoginProvider()->getSettings()->identityColumnName;
     }
 
     protected function onSuccess()
@@ -124,7 +124,7 @@ class Login extends LoginProviderLeaf
                 $this->model->failed = true;
             } catch (LoginExpiredException $er) {
                 $this->model->expired = true;
-            } catch (LoginDisabledFailedAttemptsException $er) {
+            } catch (LoginTemporarilyLockedOutException $er) {
                 $this->model->failedLoginAttempts = true;
             }
         });

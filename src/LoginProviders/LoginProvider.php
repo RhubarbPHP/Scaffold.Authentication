@@ -24,7 +24,7 @@ use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
-use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledFailedAttemptsException;
+use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginFailedException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
@@ -45,6 +45,11 @@ class LoginProvider extends ModelLoginProvider
     protected $activeColumnName = "";
 
     /**
+     * @var LoginProviderSettings
+     */
+    private $providerSettings;
+
+    /**
      * @param string $modelClassName
      * @param string|null $usernameColumnName Leave null to inherit from AuthenticationSettings::$identifyColumnName (Username by default)
      * @param string $passwordColumnName
@@ -52,11 +57,13 @@ class LoginProvider extends ModelLoginProvider
      */
     public function __construct($modelClassName = "User", $usernameColumnName = "Username", $passwordColumnName = "Password", $activeColumnName = "Enabled")
     {
-        parent::__construct($modelClassName);
-
         $this->usernameColumnName = $usernameColumnName;
         $this->passwordColumnName = $passwordColumnName;
         $this->activeColumnName = $activeColumnName;
+
+        $this->providerSettings = $this->generateSettings();
+
+        parent::__construct($modelClassName);
     }
 
     /**
@@ -67,13 +74,18 @@ class LoginProvider extends ModelLoginProvider
      *
      * @return LoginProviderSettings
      */
-    public function getLoginProviderSettings()
+    public function getSettings()
+    {
+        return $this->providerSettings;
+    }
+
+    protected function generateSettings()
     {
         $settings = new LoginProviderSettings();
         $settings->identityColumnName = $this->usernameColumnName;
         $settings->lockoutAccountAfterFailedLoginAttempts = true;
         $settings->numberOfFailedLoginAttemptsBeforeLockout = 3;
-        $settings->numberOfPreviousPasswordsToCompareTo = 3;
+        $settings->numberOfPreviousPasswords = 3;
         $settings->totalPreviousPasswordsToStore = 5;
         $settings->totalMinutesToLockUserAccount = 10;
 
@@ -111,7 +123,7 @@ class LoginProvider extends ModelLoginProvider
         } catch (LoginExpiredException $loginExpiredException) {
             $this->createFailedUserLoginAttempt($username, (string) $loginExpiredException);
             throw $loginExpiredException;
-        } catch (LoginDisabledFailedAttemptsException $loginDisabledFailedAttemptsException) {
+        } catch (LoginTemporarilyLockedOutException $loginDisabledFailedAttemptsException) {
             $this->createFailedUserLoginAttempt($username, (string) $loginDisabledFailedAttemptsException);
             throw $loginDisabledFailedAttemptsException;
         }
@@ -175,7 +187,7 @@ class LoginProvider extends ModelLoginProvider
     public function changePassword(User $user, $password)
     {
         //  Validate new password has not been previously used
-        $numberOfPastPasswordsToCompareTo = $this->getLoginProviderSettings()->numberOfPreviousPasswordsToCompareTo;
+        $numberOfPastPasswordsToCompareTo = $this->getSettings()->numberOfPreviousPasswords;
 
         if ($numberOfPastPasswordsToCompareTo) {
             $hashProvider = HashProvider::getProvider();
@@ -246,13 +258,13 @@ class LoginProvider extends ModelLoginProvider
 
         if ($this->isUserTemporarilyLockedOut($user)){
             Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the user is temporarily disabled.", "LOGIN");
-            throw new LoginExpiredException();
+            throw new LoginTemporarilyLockedOutException();
         }
     }
 
     public function hasPasswordExpired(User $user)
     {
-        $settings = $this->getLoginProviderSettings();
+        $settings = $this->getSettings();
 
         $passwordExpirationDaysInterval = $settings->passwordExpirationIntervalInDays;
 
@@ -272,7 +284,7 @@ class LoginProvider extends ModelLoginProvider
 
     public function isUserTemporarilyLockedOut(User $user)
     {
-        $settings = $this->getLoginProviderSettings();
+        $settings = $this->getSettings();
 
         if (!$settings->lockoutAccountAfterFailedLoginAttempts) {
             return false;
@@ -285,7 +297,7 @@ class LoginProvider extends ModelLoginProvider
         // Retrieve last successful login attempt
         $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user[$settings->identityColumnName]);
         if ($lastSuccesfulLoginAttempt) {
-            $andGroupFilter->addFilters(new GreaterThan("UserLoginAttemptID", $lastSuccesfulLoginAttempt->UserLoginAttemptID));
+            $andGroupFilter->addFilters(new GreaterThan("UserLogID", $lastSuccesfulLoginAttempt->UserLogID));
         }
 
         //  Get all failed login attempts from the last successful login if one can be found
@@ -300,9 +312,9 @@ class LoginProvider extends ModelLoginProvider
 
             $timeDifference = $currentDate->diff($mostRecentFailedLoginAttempt->DateCreated);
             if ($timeDifference->totalMinutes < $settings->totalMinutesToLockUserAccount) {
-                return false;
-            } else {
                 return true;
+            } else {
+                return false;
             }
         }
 
@@ -369,7 +381,7 @@ class LoginProvider extends ModelLoginProvider
             if ($request->cookie('lun') != "") {
                 $username = $request->cookie('lun');
                 try {
-                    $user = User::fromIdentifierColumnValue($username);
+                    $user = User::fromIdentifierColumnValue($this->getSettings()->identityColumnName, $username);
 
                     $token = $request->cookie('ltk');
 

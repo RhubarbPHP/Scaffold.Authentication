@@ -33,13 +33,11 @@ class LoginProviderSettings
      * Used to check how many previous passwords should be compared with when a user changes their Password
      * This is used to ensure a User cannot just reuse their previous password each time
      *
-     * NOTE: When this property is set to Zero the setting we disabled
+     * NOTE: When this property is set to Zero the setting is disabled
      *
      * @var int
      */
-    public $numberOfPreviousPasswordsToCompareTo = 0;
-
-    /****** FAILED LOGIN ATTEMPTS SETTINGS ******/
+    public $numberOfPreviousPasswords = 0;
 
     /**
      * The following flag is used to check if a users account should be disabled after a set amount of failed login attempts

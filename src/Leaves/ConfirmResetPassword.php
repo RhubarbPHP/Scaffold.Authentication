@@ -59,7 +59,7 @@ class ConfirmResetPassword extends LoginProviderLeaf
 
                 $this->getLoginProvider()->changePassword($user, $this->model->newPassword);
 
-                Log::debug("Password reset for user `" . $user[$this->getLoginProvider()->getLoginProviderSettings()->identityColumnName] . "`", "MVP");
+                Log::debug("Password reset for user `" . $user[$this->getLoginProvider()->getSettings()->identityColumnName] . "`", "MVP");
 
                 $this->model->message = "PasswordReset";
                 return true;
