@@ -1,5 +1,10 @@
 # Change Log
 
+### 1.2.1:
+
+* Changed:	Added $identityColumnName property in User model to allow consistancy validation
+		to work for models not using the Username field.
+
 ### 1.2.0
 
 * Changed:      Supports Stem 1.5 with basic model login behaviours moved into this library.
