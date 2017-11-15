@@ -32,6 +32,7 @@ use Rhubarb\Scaffolds\Authentication\Settings\LoginProviderSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Scaffolds\Authentication\UserLog;
 use Rhubarb\Stem\Collections\RepositoryCollection;
+use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
@@ -203,7 +204,8 @@ class LoginProvider extends ModelLoginProvider
             foreach ($userPastPasswords as $log) {
                 if ($hashProvider->compareHash($user->Password, $log->Data)) {
                     $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
-                    break;
+
+                    throw new ModelConsistencyValidationException($errors);
                 }
             }
         }

@@ -47,6 +47,8 @@ class User extends Model
      */
     private $passwordChanged = false;
 
+    protected $identityColumnName = 'Username';
+
     /**
      * Returns the schema for this data object.
      *
@@ -186,10 +188,9 @@ class User extends Model
         $errors = parent::getConsistencyValidationErrors();
 
         if ($this->Enabled) {
-            $identityColumnName = 'Username';
 
             // See if the identity is in use.
-            $identityFilter = new Equals($identityColumnName, $this->$identityColumnName);
+            $identityFilter = new Equals($this->identityColumnName, $this[$this->identityColumnName]);
             if (!$this->isNewRecord()) {
                 $identityFilter = new AndGroup([
                     $identityFilter,
@@ -199,14 +200,14 @@ class User extends Model
             try
             {
                 self::findFirst($identityFilter);
-                $errors[$identityColumnName] = "This ".$identityColumnName." is already in use";
+                $errors[$this->identityColumnName] = "This ".$this->identityColumnName." is already in use";
             }
             catch(RecordNotFoundException $ex) {
                 // all is well!
             }
 
-            if (!$this->$identityColumnName) {
-                $errors[$identityColumnName] = "The user must have a ".$identityColumnName;
+            if (!$this[$this->identityColumnName]) {
+                $errors[$this->identityColumnName] = "The user must have a ".$this->identityColumnName;
             }
 
             if ($this->FullName == "") {
