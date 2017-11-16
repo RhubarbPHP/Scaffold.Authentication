@@ -23,6 +23,7 @@ use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
+use Rhubarb\Crown\LoginProviders\Exceptions\CredentialsFailedException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
@@ -142,9 +143,9 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         } catch (LoginTemporarilyLockedOutException $loginDisabledFailedAttemptsException) {
             $this->createFailedUserLoginAttempt($identity, (string) $loginDisabledFailedAttemptsException);
             throw $loginDisabledFailedAttemptsException;
-        } catch (LoginFailedException $loginFailedException) {
-            $this->createFailedUserLoginAttempt($identity, (string) $loginFailedException);
-            throw $loginFailedException;
+        } catch (CredentialsFailedException $credentialsFailedException) {
+            $this->createFailedUserLoginAttempt($identity, (string) $credentialsFailedException);
+            throw $credentialsFailedException;
         }
     }
 
@@ -155,7 +156,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $password = trim($password);
 
         if ($username == "") {
-            throw new LoginFailedException();
+            throw new CredentialsFailedException();
         }
 
         $list = new RepositoryCollection($this->modelClassName);
@@ -163,7 +164,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
         if (!sizeof($list)) {
             Log::debug("Login failed for {$username} - the username didn't match a user", "LOGIN");
-            throw new LoginFailedException();
+            throw new CredentialsFailedException();
         }
 
         $hashProvider = HashProvider::getProvider();
@@ -180,7 +181,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
             if ($existingActiveUsers > 1) {
                 Log::debug("Login failed for {$username} - the username wasn't unique", "LOGIN");
-                throw new LoginFailedException();
+                throw new CredentialsFailedException();
             }
         }
 
@@ -200,7 +201,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
         Log::debug("Login failed for {$username} - the password hash $userPasswordHash didn't match the stored hash.", "LOGIN");
 
-        throw new LoginFailedException();
+        throw new CredentialsFailedException();
     }
 
     /**
