@@ -38,6 +38,8 @@ use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Filters\GreaterThan;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
+use Rhubarb\Stem\Models\Model;
+use Rhubarb\Stem\Schema\SolutionSchema;
 
 class LoginProvider extends ModelLoginProvider implements CredentialsLoginProviderInterface
 {
@@ -204,11 +206,11 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     /**
      * Changes a users password
      *
-     * @param User $user
+     * @param Model $user
      * @param $password
      * @throws ModelConsistencyValidationException Thrown if the new password was used previously within configured thresholds.
      */
-    public function changePassword(User $user, $password)
+    public function changePassword(Model $user, $password)
     {
         //  Validate new password has not been previously used
         $numberOfPastPasswordsToCompareTo = $this->getSettings()->numberOfPreviousPasswords;
@@ -287,7 +289,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         }
     }
 
-    protected function hasPasswordExpired(User $user)
+    protected function hasPasswordExpired(Model $user)
     {
         $settings = $this->getSettings();
 
@@ -307,7 +309,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         return false;
     }
 
-    protected function isUserTemporarilyLockedOut(User $user)
+    protected function isUserTemporarilyLockedOut(Model $user)
     {
         $settings = $this->getSettings();
 
@@ -388,7 +390,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     /**
      * Gets the User model currently logged in user
      *
-     * @return User
+     * @return Model
      * @throws NotLoggedInException Thrown if the user isn't logged in.
      */
     public static function getLoggedInUser()
@@ -404,9 +406,11 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
             $request = Request::current();
 
             if ($request->cookie('lun') != "") {
-                $username = $request->cookie('lun');
+                $identity = $request->cookie('lun');
                 try {
-                    $user = User::fromIdentifierColumnValue($this->getSettings()->identityColumnName, $username);
+
+                    $class = SolutionSchema::getModelClass($this->modelClassName);
+                    $user = $class::findFirst(new Equals($this->getSettings()->identityColumnName, $identity));
 
                     $token = $request->cookie('ltk');
 
