@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.6
+
+* Fixed:        Fix for validating if a user is reusing a previously entered password.
+
 ### 1.2.5
 
 * Changed:      Updated LoginProvider failed login requests due to bad credentials to throw the exception CredentialsFailedException
