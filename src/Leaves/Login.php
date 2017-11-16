@@ -19,13 +19,13 @@
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\Exceptions\ForceResponseException;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
-use Rhubarb\Scaffolds\Authentication\Exceptions\LoginFailedException;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 
 class Login extends LoginProviderLeaf
@@ -120,12 +120,12 @@ class Login extends LoginProviderLeaf
             } catch (LoginDisabledException $er) {
                 $this->model->disabled = true;
                 $this->model->failed = true;
-            } catch (LoginFailedException $er) {
-                $this->model->failed = true;
             } catch (LoginExpiredException $er) {
                 $this->model->expired = true;
             } catch (LoginTemporarilyLockedOutException $er) {
                 $this->model->failedLoginAttempts = true;
+            } catch (LoginFailedException $er) {
+                $this->model->failed = true;
             }
         });
     }
