@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.5
+
+* Changed:      Updated LoginProvider failed login requests due to bad credentials to throw the exception CredentialsFailedException
+
 ### 1.2.4:
 
 * Fixed:	ApplicationLayout tried to use non existant method after refactor
