@@ -26,6 +26,7 @@ use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
 use Rhubarb\Scaffolds\Authentication\UrlHandlers\CallableUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
+use Rhubarb\Stem\StemModule;
 
 class AuthenticationModule extends Module
 {
