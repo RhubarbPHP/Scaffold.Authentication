@@ -228,7 +228,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
             $userPastPasswords->setRange(0, $numberOfPastPasswordsToCompareTo);
 
             foreach ($userPastPasswords as $log) {
-                if ($hashProvider->compareHash($user->Password, $log->Data)) {
+                if ($hashProvider->compareHash($password, $log->Data)) {
                     $errors["Password"] = "The password you have entered has already been used. Please enter a new password.";
 
                     throw new ModelConsistencyValidationException($errors);
