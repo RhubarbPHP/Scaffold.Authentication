@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.4:
+
+* Fixed:	ApplicationLayout tried to use non existant method after refactor
+
 ### 1.2.3:
 
 * Fixed:        Fixed stemmodule error
