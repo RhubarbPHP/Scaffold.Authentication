@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.7
+
+* Fixed:        Fixed exception being thrown on the Login Leaf due to LoginFailedException being moved to the Rhubarb module
+
 ### 1.2.6
 
 * Fixed:        Fix for validating if a user is reusing a previously entered password.
