@@ -19,6 +19,7 @@
 namespace Rhubarb\Scaffolds\Authentication\Layouts;
 
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
+use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\User;
 
 class ApplicationLayout extends \Rhubarb\Patterns\Layouts\ApplicationLayout
@@ -26,7 +27,7 @@ class ApplicationLayout extends \Rhubarb\Patterns\Layouts\ApplicationLayout
     protected function printLoginStatus()
     {
         try {
-            $user = User::getLoggedInUser();
+            $user = LoginProvider::getProvider()->getModel();
             print $user->FullName;
         } catch (NotLoggedInException $er) {
             print "<p>You are not logged in.</p>";
