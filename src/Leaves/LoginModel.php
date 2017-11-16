@@ -40,6 +40,10 @@ class LoginModel extends LeafModel
 
     public $disabled = false;
 
+    public $expired = false;
+
+    public $failedLoginAttempts = false;
+
     /**
      * Raised when the user attempts the login.
      *

@@ -12,11 +12,14 @@
   },
   "require": {
     "rhubarbphp/rhubarb": "*",
-    "rhubarbphp/module-stem": "*",
+    "rhubarbphp/module-stem": "^1.5.1",
     "rhubarbphp/module-leaf": "*",
     "rhubarbphp/module-leaf-common-controls": "*"
   },
   "require-dev": {
     "codeception/codeception": "^2.3"
+  },
+  "config": {
+    "bin-dir": "bin/"
   }
 }

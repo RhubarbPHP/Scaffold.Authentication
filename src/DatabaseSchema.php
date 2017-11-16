@@ -22,10 +22,11 @@ use Rhubarb\Stem\Schema\SolutionSchema;
 
 class DatabaseSchema extends SolutionSchema
 {
-    public function __construct($version = 0.1)
+    public function __construct($version = 0.3)
     {
         parent::__construct($version);
 
         $this->addModel('User', User::class);
+        $this->addModel('UserLog', UserLog::class);
     }
 }

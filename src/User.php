@@ -18,16 +18,19 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
 use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
-use Rhubarb\Stem\Exceptions\ModelException;
+use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
+use Rhubarb\Stem\Filters\GreaterThan;
 use Rhubarb\Stem\Filters\Not;
+use Rhubarb\Stem\Interfaces\ValidateLoginModelInterface;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
 use Rhubarb\Stem\Schema\Columns\BooleanColumn;
@@ -37,6 +40,15 @@ use Rhubarb\Stem\Schema\ModelSchema;
 
 class User extends Model
 {
+    /**
+     * This flag is used to check whether a password has been changed and needs to be validated
+     * inside getConsistencyValidationErrors()
+     * @var bool
+     */
+    private $passwordChanged = false;
+
+    protected $identityColumnName = 'Username';
+
     /**
      * Returns the schema for this data object.
      *
@@ -57,7 +69,8 @@ class User extends Model
             new DateTimeColumn("TokenExpiry"),
             new BooleanColumn("Enabled", false),
             new StringColumn("PasswordResetHash", 200),
-            new DateTimeColumn("PasswordResetDate")
+            new DateTimeColumn("PasswordResetDate"),
+            new DateTimeColumn("LastPasswordChangeDate")
         );
 
         $schema->labelColumnName = "FullName";
@@ -99,6 +112,10 @@ class User extends Model
 
         $this->Password = $provider->createHash($password);
         $this->PasswordResetHash = "";
+
+        $this->LastPasswordChangeDate = new RhubarbDateTime('now');
+
+        $this->passwordChanged = true;
     }
 
     /**
@@ -116,33 +133,20 @@ class User extends Model
      * @param $username
      * @return User
      * @throws \Rhubarb\Stem\Exceptions\RecordNotFoundException
-     * @deprecated
+     * @deprecated Use fromIdentifierColumnValue instead.
      */
     public static function fromUsername($username)
     {
-        return self::fromIdentifierColumnValue($username);
+        return self::fromIdentifierColumnValue('Username', $username);
     }
 
     /**
      * @param mixed $value
      * @return Model|static
      */
-    public static function fromIdentifierColumnValue($value)
+    public static function fromIdentifierColumnValue($identityColumnName, $value)
     {
-        $settings = AuthenticationSettings::singleton();
-        return self::findFirst(new Equals($settings->identityColumnName, $value));
-    }
-
-    /**
-     * Returns the logged in User model
-     *
-     * @throws NotLoggedInException
-     */
-    public static function getLoggedInUser()
-    {
-        $loginProvider = LoginProvider::getProvider();
-
-        return $loginProvider->getModel();
+        return self::findFirst(new Equals($identityColumnName, $value));
     }
 
     /**
@@ -184,11 +188,9 @@ class User extends Model
         $errors = parent::getConsistencyValidationErrors();
 
         if ($this->Enabled) {
-            $settings = AuthenticationSettings::singleton();
-            $identityColumnName = $settings->identityColumnName;
 
             // See if the identity is in use.
-            $identityFilter = new Equals($identityColumnName, $this->$identityColumnName);
+            $identityFilter = new Equals($this->identityColumnName, $this[$this->identityColumnName]);
             if (!$this->isNewRecord()) {
                 $identityFilter = new AndGroup([
                     $identityFilter,
@@ -198,14 +200,14 @@ class User extends Model
             try
             {
                 self::findFirst($identityFilter);
-                $errors[$identityColumnName] = "This ".$identityColumnName." is already in use";
+                $errors[$this->identityColumnName] = "This ".$this->identityColumnName." is already in use";
             }
             catch(RecordNotFoundException $ex) {
                 // all is well!
             }
 
-            if (!$this->$identityColumnName) {
-                $errors[$identityColumnName] = "The user must have a ".$identityColumnName;
+            if (!$this[$this->identityColumnName]) {
+                $errors[$this->identityColumnName] = "The user must have a ".$this->identityColumnName;
             }
 
             if ($this->FullName == "") {

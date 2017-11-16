@@ -13,7 +13,7 @@ use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 /**
  * A presenter that allows a user to reset their password.
  */
-class ResetPassword extends Leaf
+class ResetPassword extends LoginProviderLeaf
 {
     protected $usernameNotFound = false;
 
@@ -25,9 +25,10 @@ class ResetPassword extends Leaf
     protected function initiateResetPassword()
     {
         try {
-            $user = User::fromIdentifierColumnValue($this->model->username);
-            $user->generatePasswordResetHash();
+            $provider = $this->getLoginProvider();
 
+            $user = User::fromIdentifierColumnValue($provider->getSettings()->identityColumnName, $this->model->username);
+            $user->generatePasswordResetHash();
             /**
              * @var ResetPasswordInvitationEmail $resetPasswordEmail
              */
@@ -59,6 +60,7 @@ class ResetPassword extends Leaf
     protected function createModel()
     {
         $model = new ResetPasswordModel();
+        $model->identityColumnName = $this->getLoginProvider()->getSettings()->identityColumnName;
         $model->resetPasswordEvent->attachHandler(function(){
             $this->initiateResetPassword();
         });

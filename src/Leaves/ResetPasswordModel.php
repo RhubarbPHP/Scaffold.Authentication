@@ -9,6 +9,8 @@ class ResetPasswordModel extends LeafModel
 {
     public $username;
 
+    public $identityColumnName;
+
     public $resetPasswordEvent;
 
     public $usernameNotFound = false;

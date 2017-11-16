@@ -22,24 +22,12 @@ use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Leaf\Leaves\Leaf;
 use Rhubarb\Leaf\Leaves\LeafModel;
 
-class Logout extends Leaf
+class Logout extends LoginProviderLeaf
 {
-    private $loginProviderClassName = "";
-
     /**
-     * @var LogoutModel
+     * @var LeafModel
      */
     protected $model;
-
-    /**
-     * @param null $loginProviderClassName
-     */
-    public function __construct($loginProviderClassName = null)
-    {
-        parent::__construct();
-
-        $this->loginProviderClassName = $loginProviderClassName;
-    }
 
     /**
      * Returns the name of the standard view used for this leaf.
@@ -69,17 +57,5 @@ class Logout extends Leaf
         $login->logOut();
 
         return parent::parseRequest($request);
-    }
-
-    /**
-     * Returns the login provider for this presenter.
-     *
-     * @return \Rhubarb\Stem\LoginProviders\ModelLoginProvider
-     */
-    private function getLoginProvider()
-    {
-        $provider = $this->loginProviderClassName;
-
-        return $provider::singleton();
     }
 }

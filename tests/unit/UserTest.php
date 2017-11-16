@@ -2,11 +2,14 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Tests;
 
+use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Encryption\Sha512HashProvider;
 use Rhubarb\Crown\Tests\Fixtures\TestCases\RhubarbTestCase;
 use Rhubarb\Scaffolds\Authentication\Exceptions\TokenException;
+use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
 
 class UserTest extends RhubarbTestCase
 {
@@ -53,10 +56,14 @@ class UserTest extends RhubarbTestCase
         $user = new User();
         $user->Forename = "test";
         $user->Username = "joebloggs";
+
+        $this->assertFalse($user->LastPasswordChangeDate->isValidDateTime());
         $user->setNewPassword("abc123");
 
         $hashProvider = HashProvider::getProvider();
         $hashProvider->compareHash("abc123", $user->Password);
+
+        $this->assertTrue($user->LastPasswordChangeDate->isValidDateTime());
     }
 
     public function testCreateToken()

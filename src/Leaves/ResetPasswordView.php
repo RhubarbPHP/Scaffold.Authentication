@@ -59,8 +59,6 @@ with the username `" . $this->model->username . "`</p>
             return;
         }
 
-        $settings = AuthenticationSettings::singleton();
-
         $this->layoutItemsWithContainer("Resetting your password",
             "<div class='c-form__help'>
 				<p>Initiating a password reset will send an email to the email address associated with your account
@@ -68,7 +66,7 @@ with the username `" . $this->model->username . "`</p>
 				<p>Clicking on the link within 24 hours will allow you to enter a new password for your account.</p>
 			</div>",
             [
-                $settings->identityColumnName => "username",
+                $this->model->identityColumnName => "username",
                 "" => "ResetPassword"
             ]
         );

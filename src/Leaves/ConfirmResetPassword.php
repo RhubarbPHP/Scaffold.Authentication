@@ -21,17 +21,28 @@ namespace Rhubarb\Scaffolds\Authentication\Leaves;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Leaf\Leaves\Leaf;
 use Rhubarb\Leaf\Leaves\LeafModel;
+use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 
-class ConfirmResetPassword extends Leaf
+class ConfirmResetPassword extends LoginProviderLeaf
 {
     /**
      * @var ConfirmResetPasswordModel
      */
     protected $model;
 
-    protected $user;
+    /**
+     * @var null
+     */
+    private $resetHash;
+
+    public function __construct(LoginProvider $loginProvider, $resetHash)
+    {
+        $this->resetHash = $resetHash;
+
+        parent::__construct($loginProvider);
+    }
 
     /**
      * @return bool
@@ -42,13 +53,13 @@ class ConfirmResetPassword extends Leaf
     {
         if ($this->model->newPassword == $this->model->confirmNewPassword && $this->model->newPassword != "") {
             try {
-                $resetHash = $this->itemIdentifier;
+                $resetHash = $this->resetHash;
 
-                $this->user = User::fromPasswordResetHash($resetHash);
-                $this->user->setNewPassword($this->model->newPassword);
-                $this->user->save();
+                $user = User::fromPasswordResetHash($resetHash);
 
-                Log::debug("Password reset for user `" . $this->user->Username . "`", "MVP");
+                $this->getLoginProvider()->changePassword($user, $this->model->newPassword);
+
+                Log::debug("Password reset for user `" . $user[$this->getLoginProvider()->getSettings()->identityColumnName] . "`", "MVP");
 
                 $this->model->message = "PasswordReset";
                 return true;

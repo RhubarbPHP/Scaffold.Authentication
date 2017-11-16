@@ -21,12 +21,11 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
-use Rhubarb\Crown\UrlHandlers\ClassMappedUrlHandler;
+use Rhubarb\Crown\UrlHandlers\GreedyUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
 use Rhubarb\Scaffolds\Authentication\UrlHandlers\CallableUrlHandler;
 use Rhubarb\Stem\Schema\SolutionSchema;
-use Rhubarb\Stem\StemModule;
 
 class AuthenticationModule extends Module
 {
@@ -73,25 +72,31 @@ class AuthenticationModule extends Module
     {
         foreach ($this->protectedUrls as $url) {
 
-            $provider = $url->loginProviderClassName;
+            $providerClassName = $url->loginProviderClassName;
+            $provider = $providerClassName::singleton();
 
             $this->addUrlHandlers([
-                $url->loginUrl => $login = new CallableUrlHandler(function () use ($url) {
+                $url->loginUrl => $login = new CallableUrlHandler(function () use ($url, $provider) {
                     $className = $url->loginLeafClassName;
-                    return new $className($url->loginProviderClassName);
+                    return new $className($provider);
                 }, [
-                    $url->resetChildUrl => $reset = new LeafCollectionUrlHandler(
-                        $url->resetPasswordLeafClassName,
-                        $url->confirmResetPasswordLeafClassName
-                    ),
-                    $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url) {
+                    $url->resetChildUrl => $reset = new CallableUrlHandler(function() use ($url, $provider){
+                        $className = $url->resetPasswordLeafClassName;
+                        return new $className($provider);
+                    },[
+                        '' => $confirmReset = new GreedyUrlHandler(function($parentHandler, $captured) use ($url, $provider){
+                            $className = $url->confirmResetPasswordLeafClassName;
+                            return new $className($provider, $captured);
+                        })
+                    ]),
+                    $url->logoutChildUrl => $logout = new CallableUrlHandler(function () use ($url, $provider) {
                         $className = $url->logoutLeafClassName;
-                        return new $className($url->loginProviderClassName);
+                        return new $className($provider, $url->loginProviderClassName);
                     }),
                     $url->activateChildUrl => $activate = new LeafCollectionUrlHandler($url->activatePasswordLeafClassName,$url->activatePasswordLeafClassName),
                 ]),
                 $url->urlToProtect => $protected =
-                    new ValidateLoginUrlHandler($provider::singleton(), $url->loginUrl),
+                    new ValidateLoginUrlHandler($provider, $url->loginUrl),
             ]);
 
             // Make sure that the login url handlers are given greater precedence than those of the application.
@@ -106,6 +111,9 @@ class AuthenticationModule extends Module
 
             $activate->setPriority(10);
             $activate->setName('activate');
+
+            $confirmReset->setPriority(10);
+            $confirmReset->setName('confirmReset');
 
             $protected->setPriority(10);
         }
