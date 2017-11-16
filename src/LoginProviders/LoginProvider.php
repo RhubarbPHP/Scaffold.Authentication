@@ -22,12 +22,12 @@ use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
+use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
-use Rhubarb\Scaffolds\Authentication\Exceptions\LoginFailedException;
-use Rhubarb\Scaffolds\Authentication\Settings\AuthenticationSettings;
 use Rhubarb\Scaffolds\Authentication\Settings\LoginProviderSettings;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Scaffolds\Authentication\UserLog;
@@ -39,7 +39,7 @@ use Rhubarb\Stem\Filters\Equals;
 use Rhubarb\Stem\Filters\GreaterThan;
 use Rhubarb\Stem\LoginProviders\ModelLoginProvider;
 
-class LoginProvider extends ModelLoginProvider
+class LoginProvider extends ModelLoginProvider implements CredentialsLoginProviderInterface
 {
     protected $usernameColumnName = "";
     protected $passwordColumnName = "";
@@ -80,6 +80,11 @@ class LoginProvider extends ModelLoginProvider
         return $this->providerSettings;
     }
 
+    /**
+     * Returns the configured settings for this provider
+     *
+     * @return LoginProviderSettings
+     */
     protected function generateSettings()
     {
         $settings = new LoginProviderSettings();
@@ -105,28 +110,39 @@ class LoginProvider extends ModelLoginProvider
         return ($model[$this->activeColumnName] == true);
     }
 
-    public function login($username, $password)
+    /**
+     * Attempts to authenticate a user using an identity and a password
+     *
+     * @param $identity
+     * @param $password
+     * @return bool
+     * @throws LoginDisabledException
+     * @throws LoginExpiredException
+     * @throws LoginFailedException
+     * @throws LoginTemporarilyLockedOutException
+     */
+    public function login($identity, $password)
     {
         try {
-            $loginStatus = $this->attemptLogin($username, $password);
+            $loginStatus = $this->attemptLogin($identity, $password);
 
             if ($loginStatus) {
-                $this->createSuccessfulUserLoginAttempt($username);
+                $this->createSuccessfulUserLoginAttempt($identity);
             }
 
             return $loginStatus;
         } catch (LoginDisabledException $loginDisabledException) {
-            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledException);
+            $this->createFailedUserLoginAttempt($identity, (string) $loginDisabledException);
             throw $loginDisabledException;
-        } catch (LoginFailedException $loginFailedException) {
-            $this->createFailedUserLoginAttempt($username, (string) $loginFailedException);
-            throw $loginFailedException;
         } catch (LoginExpiredException $loginExpiredException) {
-            $this->createFailedUserLoginAttempt($username, (string) $loginExpiredException);
+            $this->createFailedUserLoginAttempt($identity, (string) $loginExpiredException);
             throw $loginExpiredException;
         } catch (LoginTemporarilyLockedOutException $loginDisabledFailedAttemptsException) {
-            $this->createFailedUserLoginAttempt($username, (string) $loginDisabledFailedAttemptsException);
+            $this->createFailedUserLoginAttempt($identity, (string) $loginDisabledFailedAttemptsException);
             throw $loginDisabledFailedAttemptsException;
+        } catch (LoginFailedException $loginFailedException) {
+            $this->createFailedUserLoginAttempt($identity, (string) $loginFailedException);
+            throw $loginFailedException;
         }
     }
 
@@ -184,7 +200,14 @@ class LoginProvider extends ModelLoginProvider
 
         throw new LoginFailedException();
     }
-    
+
+    /**
+     * Changes a users password
+     *
+     * @param User $user
+     * @param $password
+     * @throws ModelConsistencyValidationException Thrown if the new password was used previously within configured thresholds.
+     */
     public function changePassword(User $user, $password)
     {
         //  Validate new password has not been previously used
@@ -264,7 +287,7 @@ class LoginProvider extends ModelLoginProvider
         }
     }
 
-    public function hasPasswordExpired(User $user)
+    protected function hasPasswordExpired(User $user)
     {
         $settings = $this->getSettings();
 
@@ -284,7 +307,7 @@ class LoginProvider extends ModelLoginProvider
         return false;
     }
 
-    public function isUserTemporarilyLockedOut(User $user)
+    protected function isUserTemporarilyLockedOut(User $user)
     {
         $settings = $this->getSettings();
 

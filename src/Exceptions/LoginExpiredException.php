@@ -18,10 +18,9 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Exceptions;
 
-use Exception;
-use Rhubarb\Crown\Exceptions\RhubarbException;
+use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 
-class LoginExpiredException extends RhubarbException
+class LoginExpiredException extends LoginFailedException
 {
     public function __construct($privateMessage = "", \Exception $previous = null)
     {

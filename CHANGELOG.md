@@ -1,10 +1,14 @@
 # Change Log
 
+### 1.2.2:
+
+* Changed:      LoginProvider now uses the CredentialsLoginProviderInterface 
+
 ### 1.2.1:
 
-* Changed:	Added $identityColumnName property in User model to allow consistancy validation
-		    to work for models not using the Username field.
-* Added:    Added inbuilt activation UI
+* Changed:	    Added $identityColumnName property in User model to allow consistancy validation
+		        to work for models not using the Username field.
+* Added:        Added inbuilt activation UI
 
 ### 1.2.0
 
