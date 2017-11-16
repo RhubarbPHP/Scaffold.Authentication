@@ -1,6 +1,8 @@
 # Change Log
 
-### 1.2.3:	Fixed stemmodule error
+### 1.2.3:
+
+* Fixed:        Fixed stemmodule error
 
 ### 1.2.2:
 
