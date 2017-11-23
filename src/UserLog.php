@@ -42,6 +42,7 @@ class UserLog extends Model
                 self::USER_LOG_PASSWORD_CHANGED
             ]),
             new LongStringColumn('Message'),
+            new LongStringColumn('ExceptionMessage'),
             new LongStringColumn('Data'),
             new DateTimeColumn('DateCreated')
 

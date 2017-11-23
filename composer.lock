@@ -192,6 +192,51 @@
             "time": "2017-01-09T16:06:24+00:00"
         },
         {
+            "name": "rhubarbphp/module-csrfprotection",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RhubarbPHP/Module.CsrfProtection.git",
+                "reference": "c622ae764f60c42403cc6eb2adc0ae09449bc341"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.CsrfProtection/zipball/c622ae764f60c42403cc6eb2adc0ae09449bc341",
+                "reference": "c622ae764f60c42403cc6eb2adc0ae09449bc341",
+                "shasum": ""
+            },
+            "require": {
+                "rhubarbphp/rhubarb": "^1.3.18"
+            },
+            "require-dev": {
+                "codeception/codeception": "^2.0.0",
+                "codeception/specify": "^0.4.6",
+                "codeception/verify": "^0.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Rhubarb\\Csrf\\": "src/",
+                    "Rhubarb\\Csrf\\Tests\\": "tests/unit/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "A means to provide token based CSRF protection",
+            "homepage": "http://www.rhubarbphp.com/",
+            "keywords": [
+                "csrf",
+                "framework",
+                "php",
+                "protection",
+                "rhubarb",
+                "token"
+            ],
+            "time": "2017-11-20T10:36:53+00:00"
+        },
+        {
             "name": "rhubarbphp/module-jsvalidation",
             "version": "1.1.5",
             "source": {
@@ -215,20 +260,21 @@
         },
         {
             "name": "rhubarbphp/module-leaf",
-            "version": "1.3.13",
+            "version": "1.3.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Module.Leaf.git",
-                "reference": "0a14a51b4afa11b8d1babd4a06e2808195b6cca1"
+                "reference": "94a7242f62a303ff6f0c5bc3f2f244f95f6db5cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Module.Leaf/zipball/0a14a51b4afa11b8d1babd4a06e2808195b6cca1",
-                "reference": "0a14a51b4afa11b8d1babd4a06e2808195b6cca1",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.Leaf/zipball/94a7242f62a303ff6f0c5bc3f2f244f95f6db5cf",
+                "reference": "94a7242f62a303ff6f0c5bc3f2f244f95f6db5cf",
                 "shasum": ""
             },
             "require": {
                 "rhubarbphp/custard": "^1.0.9",
+                "rhubarbphp/module-csrfprotection": "^1.0.0",
                 "rhubarbphp/module-jsvalidation": "^1.0.0",
                 "rhubarbphp/rhubarb": "^1.1.0"
             },
@@ -264,7 +310,7 @@
                 "presenter",
                 "rhubarb"
             ],
-            "time": "2017-10-24T13:50:44+00:00"
+            "time": "2017-11-22T10:55:55+00:00"
         },
         {
             "name": "rhubarbphp/module-leaf-common-controls",
@@ -307,16 +353,16 @@
         },
         {
             "name": "rhubarbphp/module-stem",
-            "version": "1.5.1",
+            "version": "1.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Module.Stem.git",
-                "reference": "14de4fef64322d9a87020db1b34d818abb2dece4"
+                "reference": "f4c913b28ca9088fb7dfa2363b8e25ec668b75c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Module.Stem/zipball/14de4fef64322d9a87020db1b34d818abb2dece4",
-                "reference": "14de4fef64322d9a87020db1b34d818abb2dece4",
+                "url": "https://api.github.com/repos/RhubarbPHP/Module.Stem/zipball/f4c913b28ca9088fb7dfa2363b8e25ec668b75c3",
+                "reference": "f4c913b28ca9088fb7dfa2363b8e25ec668b75c3",
                 "shasum": ""
             },
             "require": {
@@ -355,20 +401,20 @@
                 "orm",
                 "php"
             ],
-            "time": "2017-11-15T15:14:27+00:00"
+            "time": "2017-11-23T11:40:40+00:00"
         },
         {
             "name": "rhubarbphp/rhubarb",
-            "version": "1.4.2",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RhubarbPHP/Rhubarb.git",
-                "reference": "bae6ea2d736b14e9adc562dfd4a443f2c393033f"
+                "reference": "30d5b5dd6da27abe58b827806d4a5ef5ed035a7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/bae6ea2d736b14e9adc562dfd4a443f2c393033f",
-                "reference": "bae6ea2d736b14e9adc562dfd4a443f2c393033f",
+                "url": "https://api.github.com/repos/RhubarbPHP/Rhubarb/zipball/30d5b5dd6da27abe58b827806d4a5ef5ed035a7e",
+                "reference": "30d5b5dd6da27abe58b827806d4a5ef5ed035a7e",
                 "shasum": ""
             },
             "require": {
@@ -403,20 +449,20 @@
                 "framework",
                 "php"
             ],
-            "time": "2017-11-16T12:28:55+00:00"
+            "time": "2017-11-16T15:32:42+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "099302cc53e57cbb7414fd9f3ace40e5e2767c0b"
+                "reference": "63cd7960a0a522c3537f6326706d7f3b8de65805"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/099302cc53e57cbb7414fd9f3ace40e5e2767c0b",
-                "reference": "099302cc53e57cbb7414fd9f3ace40e5e2767c0b",
+                "url": "https://api.github.com/repos/symfony/console/zipball/63cd7960a0a522c3537f6326706d7f3b8de65805",
+                "reference": "63cd7960a0a522c3537f6326706d7f3b8de65805",
                 "shasum": ""
             },
             "require": {
@@ -471,11 +517,11 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-12T16:53:41+00:00"
+            "time": "2017-11-16T15:24:32+00:00"
         },
         {
             "name": "symfony/debug",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
@@ -745,32 +791,32 @@
         },
         {
             "name": "doctrine/instantiator",
-            "version": "1.1.0",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/instantiator.git",
-                "reference": "185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda"
+                "reference": "8e884e78f9f0eb1329e445619e04456e64d8051d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda",
-                "reference": "185b8868aa9bf7159f5f953ed5afb2d7fcdc3bda",
+                "url": "https://api.github.com/repos/doctrine/instantiator/zipball/8e884e78f9f0eb1329e445619e04456e64d8051d",
+                "reference": "8e884e78f9f0eb1329e445619e04456e64d8051d",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1"
+                "php": ">=5.3,<8.0-DEV"
             },
             "require-dev": {
                 "athletic/athletic": "~0.1.8",
                 "ext-pdo": "*",
                 "ext-phar": "*",
-                "phpunit/phpunit": "^6.2.3",
-                "squizlabs/php_codesniffer": "^3.0.2"
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~2.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2.x-dev"
+                    "dev-master": "1.0.x-dev"
                 }
             },
             "autoload": {
@@ -795,7 +841,7 @@
                 "constructor",
                 "instantiate"
             ],
-            "time": "2017-07-22T11:58:36+00:00"
+            "time": "2015-06-14T21:17:01+00:00"
         },
         {
             "name": "facebook/webdriver",
@@ -2292,7 +2338,7 @@
         },
         {
             "name": "symfony/browser-kit",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/browser-kit.git",
@@ -2349,7 +2395,7 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
@@ -2402,7 +2448,7 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
@@ -2458,7 +2504,7 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
@@ -2521,7 +2567,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
@@ -2570,7 +2616,7 @@
         },
         {
             "name": "symfony/process",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
@@ -2619,7 +2665,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.12",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",

@@ -135,16 +135,16 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
             return $loginStatus;
         } catch (LoginDisabledException $loginDisabledException) {
-            $this->createFailedUserLoginAttempt($identity, (string) $loginDisabledException);
+            $this->createFailedUserLoginAttempt($identity, get_class($loginDisabledException));
             throw $loginDisabledException;
         } catch (LoginExpiredException $loginExpiredException) {
-            $this->createFailedUserLoginAttempt($identity, (string) $loginExpiredException);
+            $this->createFailedUserLoginAttempt($identity, get_class($loginExpiredException));
             throw $loginExpiredException;
         } catch (LoginTemporarilyLockedOutException $loginDisabledFailedAttemptsException) {
-            $this->createFailedUserLoginAttempt($identity, (string) $loginDisabledFailedAttemptsException);
+            $this->createFailedUserLoginAttempt($identity, get_class($loginDisabledFailedAttemptsException));
             throw $loginDisabledFailedAttemptsException;
         } catch (CredentialsFailedException $credentialsFailedException) {
-            $this->createFailedUserLoginAttempt($identity, (string) $credentialsFailedException);
+            $this->createFailedUserLoginAttempt($identity, get_class($credentialsFailedException));
             throw $credentialsFailedException;
         }
     }
@@ -362,7 +362,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $userLoginAttempt = new UserLog();
         $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_FAILED;
         $userLoginAttempt->EnteredUsername = $username;
-        $userLoginAttempt->Message = $exceptionMessage;
+        $userLoginAttempt->ExceptionMessage = $exceptionMessage;
         $userLoginAttempt->save();
     }
 
