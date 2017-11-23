@@ -1,5 +1,10 @@
 # Change Log
 
+### 1.2.8
+
+* Fixed:        Fix for issue with Exception Logging
+* Added:        Added new ExceptionMessage Column
+
 ### 1.2.7
 
 * Fixed:        Fixed exception being thrown on the Login Leaf due to LoginFailedException being moved to the Rhubarb module
