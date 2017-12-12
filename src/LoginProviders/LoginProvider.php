@@ -320,7 +320,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
         $andGroupFilter = new AndGroup();
         $andGroupFilter->addFilters(new Equals("EnteredUsername", $user[$settings->identityColumnName]));
-        $andGroupFilter->addFilters(new Equals("Successful", false));
+        $andGroupFilter->addFilters(new Equals("LogType", UserLog::USER_LOG_LOGIN_FAILED));
 
         // Retrieve last successful login attempt
         $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user[$settings->identityColumnName]);
