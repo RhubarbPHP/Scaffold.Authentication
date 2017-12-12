@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.9
+
+* Fixed:        Fixed the check for a User account being Locked and checking a column that no longer exists on the UserLog table
+
 ### 1.2.8
 
 * Fixed:        Fix for issue with Exception Logging
