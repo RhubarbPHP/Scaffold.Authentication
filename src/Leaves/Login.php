@@ -23,6 +23,7 @@ use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
 use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Response\RedirectResponse;
+use Rhubarb\Crown\UrlHandlers\UrlHandler;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
@@ -55,6 +56,13 @@ class Login extends LoginProviderLeaf
 
     protected function getDefaultSuccessUrl()
     {
+        $path = UrlHandler::getExecutingUrlHandler()->getHandledUrl();
+        if (preg_match('|^' . preg_quote($path) . '([^/]+)|', WebRequest::current()->urlPath, $match)) {
+            $url = base64_decode($match[1]);
+            if ($url !== false) {
+                return $url;
+            }
+        }
         return "/";
     }
 
