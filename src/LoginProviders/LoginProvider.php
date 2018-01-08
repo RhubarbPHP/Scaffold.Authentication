@@ -363,6 +363,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_FAILED;
         $userLoginAttempt->EnteredUsername = $username;
         $userLoginAttempt->ExceptionMessage = $exceptionMessage;
+        $userLoginAttempt->Message = $exceptionMessage;
         $userLoginAttempt->save();
     }
 
