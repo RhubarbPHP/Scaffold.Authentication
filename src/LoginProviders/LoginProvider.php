@@ -30,7 +30,6 @@ use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
 use Rhubarb\Scaffolds\Authentication\Settings\LoginProviderSettings;
-use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Scaffolds\Authentication\UserLog;
 use Rhubarb\Stem\Collections\RepositoryCollection;
 use Rhubarb\Stem\Exceptions\ModelConsistencyValidationException;
@@ -64,6 +63,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $this->usernameColumnName = $usernameColumnName;
         $this->passwordColumnName = $passwordColumnName;
         $this->activeColumnName = $activeColumnName;
+        $this->modelClassName = $modelClassName;
 
         $this->providerSettings = $this->generateSettings();
 
@@ -363,6 +363,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_FAILED;
         $userLoginAttempt->EnteredUsername = $username;
         $userLoginAttempt->ExceptionMessage = $exceptionMessage;
+        $userLoginAttempt->Message = $exceptionMessage;
         $userLoginAttempt->save();
     }
 
