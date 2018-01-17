@@ -20,12 +20,15 @@ namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
+use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
 use Rhubarb\Crown\LoginProviders\Exceptions\CredentialsFailedException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
+use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
@@ -386,6 +389,8 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         parent::onLogOut();
         HttpResponse::unsetCookie('lun');
         HttpResponse::unsetCookie('ltk');
+        // Preventing us getting stuck at /login?logout=1 and getting a NotLoggedInException when we log in
+        throw new ForceResponseException(new RedirectResponse('/login'));
     }
 
     /**
