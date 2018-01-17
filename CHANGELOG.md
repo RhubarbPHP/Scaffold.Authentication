@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.11
+
+* Fixed:        Logout redirects to given url to prevent NotLoggedInException from /login?logout=1
+
 ### 1.2.10
 
 * Changed:      Automatically redirecting to previous URL after login 

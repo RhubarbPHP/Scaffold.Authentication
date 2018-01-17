@@ -51,6 +51,8 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     protected $passwordColumnName = "";
     protected $activeColumnName = "";
 
+    protected $logoutRedirectUrl = '/';
+
     /**
      * @var LoginProviderSettings
      */
@@ -389,8 +391,11 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         parent::onLogOut();
         HttpResponse::unsetCookie('lun');
         HttpResponse::unsetCookie('ltk');
-        // Preventing us getting stuck at /login?logout=1 and getting a NotLoggedInException when we log in
-        throw new ForceResponseException(new RedirectResponse('/login'));
+
+        // Log out redirection prevents a NotLoggedInException when we log in from /login?logout=1
+        if ($this->logoutRedirectUrl) {
+            throw new ForceResponseException(new RedirectResponse($this->logoutRedirectUrl));
+        }
     }
 
     /**
