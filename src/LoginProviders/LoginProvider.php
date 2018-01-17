@@ -51,7 +51,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     protected $passwordColumnName = "";
     protected $activeColumnName = "";
 
-    protected $logoutRedirectUrl = '/';
+    protected $logoutRedirectUrl = '';
 
     /**
      * @var LoginProviderSettings
