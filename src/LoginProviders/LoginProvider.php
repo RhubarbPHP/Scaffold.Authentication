@@ -20,12 +20,15 @@ namespace Rhubarb\Scaffolds\Authentication\LoginProviders;
 
 use Rhubarb\Crown\DateTime\RhubarbDateTime;
 use Rhubarb\Crown\Encryption\HashProvider;
+use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\Http\HttpResponse;
 use Rhubarb\Crown\Logging\Log;
 use Rhubarb\Crown\LoginProviders\CredentialsLoginProviderInterface;
 use Rhubarb\Crown\LoginProviders\Exceptions\CredentialsFailedException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
+use Rhubarb\Crown\LoginProviders\Exceptions\NotLoggedInException;
 use Rhubarb\Crown\Request\Request;
+use Rhubarb\Crown\Response\RedirectResponse;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginDisabledException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginTemporarilyLockedOutException;
 use Rhubarb\Scaffolds\Authentication\Exceptions\LoginExpiredException;
@@ -47,6 +50,8 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     protected $usernameColumnName = "";
     protected $passwordColumnName = "";
     protected $activeColumnName = "";
+
+    protected $logoutRedirectUrl = '/';
 
     /**
      * @var LoginProviderSettings
@@ -386,6 +391,11 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         parent::onLogOut();
         HttpResponse::unsetCookie('lun');
         HttpResponse::unsetCookie('ltk');
+
+        // Log out redirection prevents a NotLoggedInException when we log in from /login?logout=1
+        if ($this->logoutRedirectUrl) {
+            throw new ForceResponseException(new RedirectResponse($this->logoutRedirectUrl));
+        }
     }
 
     /**
