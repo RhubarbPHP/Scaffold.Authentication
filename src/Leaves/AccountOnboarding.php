@@ -2,10 +2,10 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
-class ActivateAccount extends ConfirmResetPassword
+class AccountOnboarding extends ConfirmResetPassword
 {
     protected function getViewClass()
     {
-        return ActivateAccountView::class;
+        return AccountOnboardingView::class;
     }
 }

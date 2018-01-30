@@ -3,8 +3,9 @@
 namespace Rhubarb\Scaffolds\Authentication\Emails;
 
 use Rhubarb\Crown\Settings\WebsiteSettings;
+use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
 
-class ActivateAccountInvitationEmail extends ResetPasswordInvitationEmail
+class AccountOnboardingInvitationEmail extends ResetPasswordInvitationEmail
 {
     public function getText()
     {
@@ -26,12 +27,12 @@ Text;
      */
     public function getSubject()
     {
-        return 'Activate Your Account';
+        return 'Create Your Account';
     }
 
     public function getHtmlHeading()
     {
-        return "<h1>Activate Your Account</h1>";
+        return "<h1>Create Your Account</h1>";
     }
 
     public function getHtmlBody()

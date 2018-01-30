@@ -4,7 +4,7 @@ namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Leaf\Controls\Common\Buttons\Button;
 
-class ActivateAccountView extends ConfirmResetPasswordView
+class AccountOnboardingView extends ConfirmResetPasswordView
 {
     protected function createSubLeaves()
     {
@@ -36,8 +36,8 @@ class ActivateAccountView extends ConfirmResetPasswordView
         $this->layoutItemsWithContainer($this->getTitle(),
             "<p class='c-form__help'>{$this->getTitleParagraph()}</p>",
             [
-                "Enter new password" => "newPassword",
-                "Enter again to confirm" => "confirmNewPassword",
+                "Create your password" => "newPassword",
+                "Confirm your password" => "confirmNewPassword",
                 "" => "ActivateAccount"
             ]
         );
@@ -45,12 +45,12 @@ class ActivateAccountView extends ConfirmResetPasswordView
 
     protected function getTitle()
     {
-        return "Activate your account";
+        return "Create your account";
     }
 
     protected function getTitleParagraph()
     {
-        return "Activate your account by setting your password.";
+        return "Create your account by setting your password.";
     }
 
     protected function getMessages()
