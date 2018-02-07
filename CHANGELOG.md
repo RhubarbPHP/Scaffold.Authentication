@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.12
+
+* FixeD:	Issue with password reset
+
 ### 1.2.11
 
 * Fixed:        Logout redirects to given url to prevent NotLoggedInException from /login?logout=1
