@@ -35,7 +35,7 @@ class ConfirmResetPassword extends LoginProviderLeaf
     /**
      * @var null
      */
-    private $resetHash;
+    protected $resetHash;
 
     public function __construct(LoginProvider $loginProvider, $resetHash)
     {

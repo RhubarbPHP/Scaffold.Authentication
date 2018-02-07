@@ -28,5 +28,4 @@ abstract class LoginProviderLeaf extends Leaf
     {
         return $this->loginProvider;
     }
-
 }
