@@ -307,7 +307,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
         if ($passwordExpirationDaysInterval && $lastPasswordChangeDate && $lastPasswordChangeDate->isValidDateTime()) {
             $timeDifference = $currentDate->diff($lastPasswordChangeDate);
-            if ($timeDifference->totalDays > $passwordExpirationDaysInterval) {
+            if ($timeDifference->totalDays > $passwordExpirationDaysInterval && $timeDifference->invert) {
                 return true;
             }
         }
