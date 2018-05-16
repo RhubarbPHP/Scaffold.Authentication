@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.2.13
+
+* Fixed:	Ensures password expiration only checking if the password expiration is in the past
+
 ### 1.2.12
 
 * FixeD:	Issue with password reset
