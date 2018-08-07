@@ -21,7 +21,7 @@ class UserLog extends Model
     const USER_LOG_LOGIN_SUCCESSFUL = 'Login successful';
     const USER_LOG_LOGIN_FAILED = 'Login failed';
     const USER_LOG_LOGIN_EXPIRED = 'Login expired';
-    const USER_LOG_LOGIN_LOCKED = 'Login lLocked out';
+    const USER_LOG_LOGIN_LOCKED = 'Login locked out';
     const USER_LOG_LOGIN_DISABLED = 'Login disabled';
     const USER_LOG_PASSWORD_CHANGED = 'Password changed';
 
@@ -41,8 +41,6 @@ class UserLog extends Model
                 self::USER_LOG_LOGIN_DISABLED,
                 self::USER_LOG_PASSWORD_CHANGED
             ]),
-            new LongStringColumn('Message'),
-            new LongStringColumn('ExceptionMessage'),
             new LongStringColumn('Data'),
             new DateTimeColumn('DateCreated')
 

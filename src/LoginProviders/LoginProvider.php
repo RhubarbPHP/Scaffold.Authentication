@@ -140,16 +140,16 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
 
             return $loginStatus;
         } catch (LoginDisabledException $loginDisabledException) {
-            $this->createFailedUserLoginAttempt($identity, get_class($loginDisabledException));
+            $this->createFailedUserLoginAttempt($identity, UserLog::USER_LOG_LOGIN_DISABLED);
             throw $loginDisabledException;
         } catch (LoginExpiredException $loginExpiredException) {
-            $this->createFailedUserLoginAttempt($identity, get_class($loginExpiredException));
+            $this->createFailedUserLoginAttempt($identity, UserLog::USER_LOG_LOGIN_EXPIRED);
             throw $loginExpiredException;
         } catch (LoginTemporarilyLockedOutException $loginDisabledFailedAttemptsException) {
-            $this->createFailedUserLoginAttempt($identity, get_class($loginDisabledFailedAttemptsException));
+            $this->createFailedUserLoginAttempt($identity, UserLog::USER_LOG_LOGIN_LOCKED);
             throw $loginDisabledFailedAttemptsException;
         } catch (CredentialsFailedException $credentialsFailedException) {
-            $this->createFailedUserLoginAttempt($identity, get_class($credentialsFailedException));
+            $this->createFailedUserLoginAttempt($identity, UserLog::USER_LOG_LOGIN_FAILED);
             throw $credentialsFailedException;
         }
     }
@@ -362,12 +362,11 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $userLoginAttempt->save();
     }
 
-    private function createFailedUserLoginAttempt($username, $exceptionMessage)
+    private function createFailedUserLoginAttempt($username, $logType)
     {
         $userLoginAttempt = new UserLog();
-        $userLoginAttempt->LogType = UserLog::USER_LOG_LOGIN_FAILED;
+        $userLoginAttempt->LogType = $logType;
         $userLoginAttempt->EnteredUsername = $username;
-        $userLoginAttempt->ExceptionMessage = $exceptionMessage;
         $userLoginAttempt->save();
     }
 
