@@ -1,12 +1,18 @@
 # Change Log
 
+### 1.3.0
+
+* Fixed:        Log type field not being set properly upon different failures of login
+* Changed:      Extraction of URL for redirection now moved to Url handler 
+* Added:        Redirection only now possible to relative or absolute paths on the same domain. 
+
 ### 1.2.13
 
-* Fixed:	Ensures password expiration only checking if the password expiration is in the past
+* Fixed:	    Ensures password expiration only checking if the password expiration is in the past
 
 ### 1.2.12
 
-* FixeD:	Issue with password reset
+* Fixed:	    Issue with password reset
 
 ### 1.2.11
 
