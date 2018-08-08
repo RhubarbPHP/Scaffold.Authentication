@@ -108,7 +108,7 @@ class Login extends LoginProviderLeaf
     protected function isRedirectionUrlValid(string $url)
     {
         // No http or https
-        if (stripos($url, "http")===0){
+        if (stripos(trim($url), "http")===0){
             return false;
         }
 
