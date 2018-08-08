@@ -164,7 +164,8 @@ class LoginProviderTest extends RhubarbTestCase
         $this->assertEquals(1, UserLog::find()->count());
         $userLoginAttempt = UserLog::find()[0];
 
-        $this->assertEquals($userLoginAttempt->LogType, UserLog::USER_LOG_LOGIN_FAILED);
+        $this->assertFalse($userLoginAttempt->LogType == UserLog::USER_LOG_LOGIN_SUCCESSFUL);
+        $this->assertNotEmpty($userLoginAttempt->Message);
     }
 
     public function testSuccessfulLoginAttemptBeingRecorded()
@@ -223,6 +224,15 @@ class LoginProviderTest extends RhubarbTestCase
             $provider->login("test", "test");
         } catch(LoginExpiredException $er){
             $this->fail("The user should not have been reported as expired");
+        }
+
+        $user->LastPasswordChangeDate = new RhubarbDateTime('-2.5 days');
+        $user->save();
+
+        try {
+            $provider->login("test", "test");
+            $this->fail("The user should have been reported as expired");
+        } catch(LoginExpiredException $er){
         }
 
         $user->LastPasswordChangeDate = new RhubarbDateTime('-2 days');

@@ -47,14 +47,6 @@ class Login extends LoginProviderLeaf
 
     protected function onSuccess()
     {
-        $path = UrlHandler::getExecutingUrlHandler()->getHandledUrl();
-        if (preg_match('|^' . preg_quote($path) . '([^/]+)|', WebRequest::current()->urlPath, $match)) {
-            $url = base64_decode($match[1]);
-            if ($url !== false) {
-                return $url;
-            }
-        }
-
         if (isset($this->model->redirectUrl)) {
             throw new ForceResponseException(new RedirectResponse($this->model->redirectUrl));
         }
@@ -64,6 +56,13 @@ class Login extends LoginProviderLeaf
 
     protected function getDefaultSuccessUrl()
     {
+        $path = UrlHandler::getExecutingUrlHandler()->getHandledUrl();
+        if (preg_match('|^' . preg_quote($path) . '([^/]+)|', WebRequest::current()->urlPath, $match)) {
+            $url = base64_decode($match[1]);
+            if ($url !== false) {
+                return $url;
+            }
+        }
         return "/";
     }
 
