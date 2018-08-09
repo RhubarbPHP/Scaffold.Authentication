@@ -15,6 +15,9 @@ abstract class LoginProviderLeaf extends Leaf
     public function __construct(LoginProvider $loginProvider, $initialiseModelBeforeView = null)
     {
         $this->loginProvider = $loginProvider;
+        if (!is_callable($initialiseModelBeforeView)) {
+            $initialiseModelBeforeView = null;
+        }
         
         parent::__construct(null, $initialiseModelBeforeView);
     }
