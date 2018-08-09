@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
+use Rhubarb\Crown\Application;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
@@ -144,8 +145,10 @@ class Login extends LoginProviderLeaf
             $login->logOut();
         }
 
-        if ($login->isLoggedIn()) {
-            $this->onSuccess();
+        if (!Application::current()->context()->isXhrRequest()) {
+            if ($login->isLoggedIn()) {
+                $this->onSuccess();
+            }
         }
 
         parent::parseRequest($request);

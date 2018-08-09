@@ -4,7 +4,8 @@
 
 * Fixed:        Log type field not being set properly upon different failures of login
 * Changed:      Extraction of URL for redirection now moved to Url handler 
-* Added:        Redirection only now possible to relative or absolute paths on the same domain. 
+* Added:        Redirection only now possible to relative or absolute paths on the same domain.
+* Added:        Redirection doesn't occur if the login is attempted using an XHR pathway 
 
 ### 1.2.13
 
