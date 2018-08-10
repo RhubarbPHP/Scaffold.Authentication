@@ -21,6 +21,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Crown\LoginProviders\LoginProvider;
 use Rhubarb\Crown\LoginProviders\UrlHandlers\ValidateLoginUrlHandler;
 use Rhubarb\Crown\Module;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\UrlHandlers\GreedyUrlHandler;
 use Rhubarb\Leaf\UrlHandlers\LeafCollectionUrlHandler;
 use Rhubarb\Scaffolds\Authentication\Settings\ProtectedUrl;
@@ -79,7 +80,19 @@ class AuthenticationModule extends Module
             $this->addUrlHandlers([
                 $url->loginUrl => $login = new CallableUrlHandler(function () use ($url, $provider) {
                     $className = $url->loginLeafClassName;
-                    return new $className($provider);
+
+                    // Check the URL for additional base64 encoded data which we'll interpret as the
+                    // URL we should redirect to if login succeeds.
+                    $redirectionUrl = null;
+                    $path = $url->loginUrl;
+                    if (preg_match('|^' . preg_quote($path) . '([^/]+)|', WebRequest::current()->urlPath, $match)) {
+                        $url = base64_decode($match[1]);
+                        if ($url !== false) {
+                            $redirectionUrl = $url;
+                        }
+                    }
+
+                    return new $className($provider, $redirectionUrl);
                 }, [
                     $url->resetChildUrl => $reset = new CallableUrlHandler(function() use ($url, $provider){
                         $className = $url->resetPasswordLeafClassName;

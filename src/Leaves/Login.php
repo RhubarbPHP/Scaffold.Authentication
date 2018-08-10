@@ -18,6 +18,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
+use Rhubarb\Crown\Application;
 use Rhubarb\Crown\Exceptions\ForceResponseException;
 use Rhubarb\Crown\LoginProviders\Exceptions\LoginFailedException;
 use Rhubarb\Crown\Request\Request;
@@ -38,34 +39,103 @@ class Login extends LoginProviderLeaf
      */
     protected $model;
 
-    public function __construct(LoginProvider $loginProvider)
+    /**
+     * Login constructor.
+     *
+     * @param LoginProvider $loginProvider The login provider to use when attempting login
+     * @param null $redirectionUrl Optionally the URL to redirect to if login succeeds.
+     * @throws \Rhubarb\Leaf\Exceptions\InvalidLeafModelException
+     */
+    public function __construct(LoginProvider $loginProvider, $redirectionUrl = null)
     {
         parent::__construct($loginProvider);
 
         $this->model->identityColumnName = $this->getLoginProvider()->getSettings()->identityColumnName;
+
+        if ($redirectionUrl !== null){
+            $this->model->redirectUrl = $redirectionUrl;
+        }
     }
 
+    /**
+     * Handles the behaviour if the login is successful.
+     *
+     * The default implementation is to redirect to
+     * 1) Our model's `redirectUrl` property
+     * 2) A URL (within the current site) specified on the URL base64 encoded
+     *      (e.g /login/L2NvbmdyYXRzLWZvci1jaGVja2luZy8=)
+     * 3) The URL provided by `getDefaultSuccessUrl()`
+     *
+     * The first of those to return a value is used for the redirection.
+     *
+     * @return bool|string
+     * @throws ForceResponseException
+     */
     protected function onSuccess()
     {
+        $redirectionUrl = "";
+
+        // First check if the model has a target for redirection in mind.
         if (isset($this->model->redirectUrl)) {
-            throw new ForceResponseException(new RedirectResponse($this->model->redirectUrl));
+            $redirectionUrl = $this->model->redirectUrl;
         }
 
-        throw new ForceResponseException(new RedirectResponse($this->getDefaultSuccessUrl()));
-    }
+        if (!$redirectionUrl){
+            // Finally fallback to the Leave's default success URL:
+            $redirectionUrl = $this->getDefaultSuccessUrl();
+        }
 
-    protected function getDefaultSuccessUrl()
-    {
-        $path = UrlHandler::getExecutingUrlHandler()->getHandledUrl();
-        if (preg_match('|^' . preg_quote($path) . '([^/]+)|', WebRequest::current()->urlPath, $match)) {
-            $url = base64_decode($match[1]);
-            if ($url !== false) {
-                return $url;
+        if (!$redirectionUrl){
+            $redirectionUrl = "/";
+        } else {
+            // Check any supplied redirection URL is on the same host
+            if (!$this->isRedirectionUrlValid($redirectionUrl)){
+                $redirectionUrl = "/";
             }
         }
+
+        throw new ForceResponseException(new RedirectResponse($redirectionUrl));
+    }
+
+    /**
+     * Checks to make sure the URL is a relative or absolute path on the
+     * existing domain.
+     *
+     * Simply returns false if the url starts with http or https
+     *
+     * @param string $url
+     * @return bool True if the url is valid, false if it is not
+     */
+    protected function isRedirectionUrlValid(string $url)
+    {
+        // No http or https
+        if (stripos(trim($url), "http")===0){
+            return false;
+        }
+
+        // In fact no scheme:// at all thanks.
+        if (stripos($url, "://")!==false){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the URL the Login will redirect to if successful and no other advice
+     * has been given about ongoing target.
+     *
+     * @return string
+     */
+    protected function getDefaultSuccessUrl()
+    {
         return "/";
     }
 
+    /**
+     * @param WebRequest $request
+     * @throws ForceResponseException
+     */
     protected function parseRequest(WebRequest $request)
     {
         $login = $this->getLoginProvider();
@@ -75,8 +145,10 @@ class Login extends LoginProviderLeaf
             $login->logOut();
         }
 
-        if ($login->isLoggedIn()) {
-            $this->onSuccess();
+        if (!Application::current()->context()->isXhrRequest()) {
+            if ($login->isLoggedIn()) {
+                $this->onSuccess();
+            }
         }
 
         parent::parseRequest($request);
@@ -105,7 +177,10 @@ class Login extends LoginProviderLeaf
     protected function onModelCreated()
     {
         /** @var WebRequest $request */
-        $request = Request::current();
+        $request = Request::current();#
+
+        // Deprecated - instead of using ?rd=[base64encodedUrl] use
+        // /login/[base64encodedurl]
         $redirectUrl = $request->get('rd');
         if ($redirectUrl) {
             $redirectUrl = urldecode($redirectUrl);
