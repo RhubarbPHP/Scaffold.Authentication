@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.3.1
+
+* Added:        Forgotten password now is sent the original attempted email (if present)
+
 ### 1.3.0
 
 * Fixed:        Log type field not being set properly upon different failures of login

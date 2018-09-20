@@ -3,6 +3,7 @@
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
 use Rhubarb\Crown\DependencyInjection\Container;
+use Rhubarb\Crown\Request\WebRequest;
 use Rhubarb\Crown\Sendables\Email\EmailProvider;
 use Rhubarb\Leaf\Leaves\Leaf;
 use Rhubarb\Leaf\Leaves\LeafModel;
@@ -21,6 +22,15 @@ class ResetPassword extends LoginProviderLeaf
      * @var ResetPasswordModel
      */
     protected $model;
+
+    protected function parseRequest(WebRequest $request)
+    {
+        if ($request->get("e", false)){
+            $this->model->username = $request->get("e");
+        }
+
+        return parent::parseRequest($request);
+    }
 
     protected function initiateResetPassword()
     {

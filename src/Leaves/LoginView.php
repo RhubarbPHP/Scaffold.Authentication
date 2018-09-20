@@ -22,6 +22,7 @@ use Rhubarb\Leaf\Controls\Common\Buttons\Button;
 use Rhubarb\Leaf\Controls\Common\Checkbox\Checkbox;
 use Rhubarb\Leaf\Controls\Common\Text\PasswordTextBox;
 use Rhubarb\Leaf\Controls\Common\Text\TextBox;
+use Rhubarb\Leaf\Leaves\LeafDeploymentPackage;
 use Rhubarb\Leaf\Views\View;
 
 class LoginView extends View
@@ -45,6 +46,16 @@ class LoginView extends View
         );
 
         $username->addHtmlAttribute('autofocus', 'autofocus');
+    }
+
+    public function getDeploymentPackage()
+    {
+        return new LeafDeploymentPackage(__DIR__.'/LoginViewBridge.js');
+    }
+
+    protected function getViewBridgeName()
+    {
+        return "LoginViewBridge";
     }
 
     public function printViewContent()
@@ -77,7 +88,7 @@ class LoginView extends View
                 <label class="c-form__label c-form__label--checkbox"><?= $this->leaves["rememberMe"]; ?> Remember Me</label>
             </div>
             <div class="c-form__actions-forgot">
-                <a href="<?= $this->model->passwordResetUrl; ?>">I've forgotten my password.</a>
+                <a href="<?= $this->model->passwordResetUrl; ?> class="js-resetLink">I've forgotten my password.</a>
             </div>
             </div>
 
