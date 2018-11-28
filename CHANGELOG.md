@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.3.2
+
+* Fixed:        Fixed issue where user could not login after changing password when too many login attempts exceeded
+
 ### 1.3.1
 
 * Added:        Forgotten password now is sent the original attempted email (if present)
