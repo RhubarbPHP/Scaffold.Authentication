@@ -327,10 +327,10 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $andGroupFilter->addFilters(new Equals("EnteredUsername", $user[$settings->identityColumnName]));
         $andGroupFilter->addFilters(new Equals("LogType", UserLog::USER_LOG_LOGIN_FAILED));
 
-        // Retrieve last successful login attempt
-        $lastSuccesfulLoginAttempt = UserLog::getLastSuccessfulLoginAttempt($user[$settings->identityColumnName]);
-        if ($lastSuccesfulLoginAttempt) {
-            $andGroupFilter->addFilters(new GreaterThan("UserLogID", $lastSuccesfulLoginAttempt->UserLogID));
+        // Retrieve last successful login attempt or Password Change Attempt
+        $lastSuccesfulLoginOrPasswordChangeAttempt = UserLog::getLastSuccessfulUserLoginOrPasswordChangeAttempt($user[$settings->identityColumnName], $user->getUniqueIdentifier());
+        if ($lastSuccesfulLoginOrPasswordChangeAttempt) {
+            $andGroupFilter->addFilters(new GreaterThan("UserLogID", $lastSuccesfulLoginOrPasswordChangeAttempt->UserLogID));
         }
 
         //  Get all failed login attempts from the last successful login if one can be found
