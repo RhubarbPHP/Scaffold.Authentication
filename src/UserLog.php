@@ -5,6 +5,7 @@ namespace Rhubarb\Scaffolds\Authentication;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
+use Rhubarb\Stem\Filters\OrGroup;
 use Rhubarb\Stem\Models\Model;
 use Rhubarb\Stem\Repositories\MySql\Schema\Columns\MySqlEnumColumn;
 use Rhubarb\Stem\Schema\Columns\AutoIncrementColumn;
@@ -67,6 +68,44 @@ class UserLog extends Model
                     new Equals("LogType", self::USER_LOG_LOGIN_SUCCESSFUL)
                 ]
             ));
+        } catch (RecordNotFoundException $exception) {
+        }
+
+        return null;
+    }
+
+    public static function getLastSuccessfulPasswordChangeAttempt($userId)
+    {
+        try {
+            return self::findLast(new AndGroup(
+                [
+                    new Equals("UserID", $userId),
+                    new Equals("LogType", self::USER_LOG_PASSWORD_CHANGED)
+                ]
+            ));
+        } catch (RecordNotFoundException $exception) {
+        }
+
+        return null;
+    }
+
+    public static function getLastSuccessfulUserLoginOrPasswordChangeAttempt($username, $userId)
+    {
+        try {
+            return self::findLast(
+                new OrGroup([
+                    new AndGroup(
+                        [
+                            new Equals("EnteredUsername", $username),
+                            new Equals("LogType", self::USER_LOG_LOGIN_SUCCESSFUL)
+                        ]),
+                    new AndGroup(
+                        [
+                            new Equals("UserID", $userId),
+                            new Equals("LogType", self::USER_LOG_PASSWORD_CHANGED)
+                        ]),
+                ])
+            );
         } catch (RecordNotFoundException $exception) {
         }
 
