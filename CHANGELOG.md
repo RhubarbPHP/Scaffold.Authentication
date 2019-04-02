@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.0
+
+* Added:        Recording IP address to UserLog. Populated in before save.
+
 ### 1.3.2
 
 * Fixed:        Fixed issue where user could not login after changing password when too many login attempts exceeded
