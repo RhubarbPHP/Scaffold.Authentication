@@ -2,6 +2,7 @@
 
 namespace Rhubarb\Scaffolds\Authentication;
 
+use Rhubarb\Crown\Request\Request;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
 use Rhubarb\Stem\Filters\AndGroup;
 use Rhubarb\Stem\Filters\Equals;
@@ -43,8 +44,8 @@ class UserLog extends Model
                 self::USER_LOG_PASSWORD_CHANGED
             ]),
             new LongStringColumn('Data'),
-            new DateTimeColumn('DateCreated')
-
+            new DateTimeColumn('DateCreated'),
+            new StringColumn('IPAddress', 40)
         );
 
         return $modelSchema;
@@ -54,9 +55,23 @@ class UserLog extends Model
     {
         if ($this->isNewRecord()) {
             $this->DateCreated = 'now';
+            $this->IPAddress = self::getUserIpAddress();
         }
 
         parent::beforeSave();
+    }
+
+    public static function getUserIpAddress() : string {
+        // Support for Amazon ELB's
+        if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+
+        return '';
     }
 
     public static function getLastSuccessfulLoginAttempt($username)

@@ -22,7 +22,7 @@ use Rhubarb\Stem\Schema\SolutionSchema;
 
 class DatabaseSchema extends SolutionSchema
 {
-    public function __construct($version = 0.4)
+    public function __construct($version = 0.5)
     {
         parent::__construct($version);
 
