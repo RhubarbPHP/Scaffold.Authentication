@@ -10,6 +10,7 @@ use Rhubarb\Leaf\Leaves\LeafModel;
 use Rhubarb\Scaffolds\Authentication\Emails\ResetPasswordInvitationEmail;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Schema\SolutionSchema;
 
 /**
  * A presenter that allows a user to reset their password.
@@ -37,7 +38,8 @@ class ResetPassword extends LoginProviderLeaf
         try {
             $provider = $this->getLoginProvider();
 
-            $user = User::fromIdentifierColumnValue($provider->getSettings()->identityColumnName, $this->model->username);
+            $providerModelClass = SolutionSchema::getModelClass($provider->getSettings()->modelClassName);
+            $user = $providerModelClass::fromIdentifierColumnValue($provider->getSettings()->identityColumnName, $this->model->username);
             $user->generatePasswordResetHash();
             /**
              * @var ResetPasswordInvitationEmail $resetPasswordEmail
