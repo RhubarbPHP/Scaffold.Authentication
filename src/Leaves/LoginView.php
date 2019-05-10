@@ -88,7 +88,7 @@ class LoginView extends View
                 <label class="c-form__label c-form__label--checkbox"><?= $this->leaves["rememberMe"]; ?> Remember Me</label>
             </div>
             <div class="c-form__actions-forgot">
-                <a href="<?= $this->model->passwordResetUrl; ?> class="js-resetLink">I've forgotten my password.</a>
+                <a href="<?= $this->model->passwordResetUrl; ?>" class="js-resetLink">I've forgotten my password.</a>
             </div>
             </div>
 
