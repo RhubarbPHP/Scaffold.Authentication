@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.1
+
+* Fixed:        Fixed issue with broken forgot password link
+
 ### 1.4.0
 
 * Added:        Recording IP address to UserLog. Populated in before save.
