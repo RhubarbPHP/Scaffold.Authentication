@@ -126,7 +126,7 @@ class User extends Model
      */
     public static function fromPasswordResetHash($hash)
     {
-        return self::findFirst(new Equals("PasswordResetHash", $hash));
+        return static::findFirst(new Equals("PasswordResetHash", $hash));
     }
 
     /**
@@ -137,7 +137,7 @@ class User extends Model
      */
     public static function fromUsername($username)
     {
-        return self::fromIdentifierColumnValue('Username', $username);
+        return static::fromIdentifierColumnValue('Username', $username);
     }
 
     /**
@@ -146,7 +146,7 @@ class User extends Model
      */
     public static function fromIdentifierColumnValue($identityColumnName, $value)
     {
-        return self::findFirst(new Equals($identityColumnName, $value));
+        return static::findFirst(new Equals($identityColumnName, $value));
     }
 
     /**

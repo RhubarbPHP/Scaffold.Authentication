@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.3
+
+* Change:       Methods in User now use static:: instead of self::
+
 ### 1.4.2
 
 * Change:	    The model used during confirm reset password is looked up using model aliases in case
