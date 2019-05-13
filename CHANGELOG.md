@@ -1,5 +1,10 @@
 # Change Log
 
+### 1.4.1
+
+* Change:	The model used during reset password is looked up using model aliases in case
+		the model is being entirely replaced.
+
 ### 1.4.0
 
 * Added:        Recording IP address to UserLog. Populated in before save.
