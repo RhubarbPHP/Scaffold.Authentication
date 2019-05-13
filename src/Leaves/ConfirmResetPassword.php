@@ -56,6 +56,7 @@ class ConfirmResetPassword extends LoginProviderLeaf
             try {
                 $resetHash = $this->resetHash;
 
+                $provider = $this->getLoginProvider();
                 $providerModelClass = SolutionSchema::getModelClass($provider->getSettings()->modelClassName);
                 $user = $providerModelClass::fromPasswordResetHash($resetHash);
 

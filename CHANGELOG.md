@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.5
+
+* Fix:          Missing Provider statement
+
 ### 1.4.4
 
 * Fix:          Missing use statement in User
