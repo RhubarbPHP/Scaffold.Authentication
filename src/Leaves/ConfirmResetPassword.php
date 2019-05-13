@@ -24,6 +24,7 @@ use Rhubarb\Leaf\Leaves\LeafModel;
 use Rhubarb\Scaffolds\Authentication\LoginProviders\LoginProvider;
 use Rhubarb\Scaffolds\Authentication\User;
 use Rhubarb\Stem\Exceptions\RecordNotFoundException;
+use Rhubarb\Stem\Schema\SolutionSchema;
 
 class ConfirmResetPassword extends LoginProviderLeaf
 {

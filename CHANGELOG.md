@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.4
+
+* Fix:          Missing use statement in User
+
 ### 1.4.3
 
 * Change:       Methods in User now use static:: instead of self::
