@@ -50,6 +50,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     protected $usernameColumnName = "";
     protected $passwordColumnName = "";
     protected $activeColumnName = "";
+    protected $modelClassName = "";
 
     protected $logoutRedirectUrl = '';
 
@@ -69,6 +70,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         $this->usernameColumnName = $usernameColumnName;
         $this->passwordColumnName = $passwordColumnName;
         $this->activeColumnName = $activeColumnName;
+        $this->modelClassName = $modelClassName;
 
         $this->providerSettings = $this->generateSettings();
 
@@ -97,6 +99,7 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
     {
         $settings = new LoginProviderSettings();
         $settings->identityColumnName = $this->usernameColumnName;
+        $settings->modelClassName = $this->modelClassName;
         $settings->lockoutAccountAfterFailedLoginAttempts = true;
         $settings->numberOfFailedLoginAttemptsBeforeLockout = 3;
         $settings->numberOfPreviousPasswords = 3;
