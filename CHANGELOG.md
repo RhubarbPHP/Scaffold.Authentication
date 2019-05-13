@@ -2,8 +2,9 @@
 
 ### 1.4.1
 
-* Change:	The model used during reset password is looked up using model aliases in case
-		the model is being entirely replaced.
+* Fixed:        Fixed issue with broken forgot password link
+* Change:	      The model used during reset password is looked up using model aliases in case
+		            the model is being entirely replaced.
 
 ### 1.4.0
 
