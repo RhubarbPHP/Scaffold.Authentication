@@ -57,4 +57,11 @@ class LoginProviderSettings
      * @var int
      */
     public $totalMinutesToLockUserAccount = 0;
+
+    /**
+     * The class name of the model to use for logging in
+     *
+     * @var string|null
+     */
+    public $modelClassName = null;
 }
