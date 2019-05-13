@@ -1,10 +1,15 @@
 # Change Log
 
+### 1.4.2
+
+* Change:	    The model used during confirm reset password is looked up using model aliases in case
+		        the model is being entirely replaced.
+
 ### 1.4.1
 
 * Fixed:        Fixed issue with broken forgot password link
-* Change:	      The model used during reset password is looked up using model aliases in case
-		            the model is being entirely replaced.
+* Change:	    The model used during reset password is looked up using model aliases in case
+		        the model is being entirely replaced.
 
 ### 1.4.0
 
