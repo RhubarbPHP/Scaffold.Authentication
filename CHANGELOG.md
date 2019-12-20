@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.6
+
+* Fix:          Disabled users not properly handled.
+
 ### 1.4.5
 
 * Fix:          Missing Provider statement

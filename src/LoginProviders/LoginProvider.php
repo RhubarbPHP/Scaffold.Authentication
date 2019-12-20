@@ -181,10 +181,14 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
         // unique *combinations* of username and password but it's a potential security issue and
         // could trip us up when supporting the project.
         $existingActiveUsers = 0;
+        $hadInactive = false;
+        $activeUser = null;
         foreach ($list as $user) {
             if ($this->isModelActive($user)) {
                 $activeUser = $user;
                 $existingActiveUsers++;
+            } else {
+                $hadInactive = true;
             }
 
             if ($existingActiveUsers > 1) {
@@ -280,10 +284,10 @@ class LoginProvider extends ModelLoginProvider implements CredentialsLoginProvid
      * @param $user
      * @throws \Exception Thrown if the user should not be permitted to login.
      */
-    protected function checkUserIsPermitted($user)
+    protected function checkUserIsPermitted($user = null)
     {
-        if (!isset($user)) {
-            Log::debug("Login failed for ".$user[$this->usernameColumnName]." - the user is disabled.", "LOGIN");
+        if (!$user) {
+            Log::debug("Login failed for - the user is disabled.", "LOGIN");
             throw new LoginDisabledException();
         }
 
