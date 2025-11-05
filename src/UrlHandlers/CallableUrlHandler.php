@@ -20,7 +20,7 @@ class CallableUrlHandler extends UrlHandler
         $this->callable = $callable;
     }
 
-    public function generateResponseForRequest($request = null)
+    public function generateResponseForRequest($request = null, $currentUrlFragment = "")
     {
         $method = $this->callable;
         $object = $method();
