@@ -1,5 +1,9 @@
 # Change Log
 
+### 1.4.7
+
+* Fixed: 		Method signatures for UrlHandler abstract/override method implementation
+
 ### 1.4.6
 
 * Fix:          Disabled users not properly handled.
