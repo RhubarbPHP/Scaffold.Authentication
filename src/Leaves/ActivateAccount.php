@@ -2,10 +2,8 @@
 
 namespace Rhubarb\Scaffolds\Authentication\Leaves;
 
-class ActivateAccount extends ConfirmResetPassword
+/** @deprecated use AccountOnboarding */
+class ActivateAccount extends AccountOnboarding
 {
-    protected function getViewClass()
-    {
-        return ActivateAccountView::class;
-    }
+
 }

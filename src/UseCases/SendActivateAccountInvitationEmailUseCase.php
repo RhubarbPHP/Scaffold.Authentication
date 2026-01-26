@@ -1,18 +1,11 @@
 <?php
 
-namespace Rhubarb\Scaffolds\Authentication\Leaves;
+namespace Rhubarb\Scaffolds\Authentication\UseCases;
 
-use Rhubarb\Crown\DependencyInjection\Container;
-use Rhubarb\Crown\Sendables\Email\EmailProvider;
-use Rhubarb\Scaffolds\Authentication\Emails\ActivateAccountInvitationEmail;
-use Rhubarb\Scaffolds\Authentication\User;
+use Rhubarb\Scaffolds\Authentication\Leaves\SendAccountOnboardingInvitationEmailUseCase;
 
-class SendActivateAccountInvitationEmailUseCase
+/** @deprecated use SendAccountOnboardingInvitiationEmailUseCase */
+class SendActivateAccountInvitationEmailUseCase extends SendAccountOnboardingInvitationEmailUseCase
 {
-    public static function execute(User $user)
-    {
-        $user->generatePasswordResetHash();
-        $resetPasswordEmail = Container::instance(ActivateAccountInvitationEmail::class, $user);
-        EmailProvider::selectProviderAndSend($resetPasswordEmail);
-    }
+
 }
